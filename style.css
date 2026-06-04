@@ -1106,4 +1106,14 @@ body {
   .header-right.open {
     display: flex;
   }
+
+  /* Full-width search dropdown pinned below header */
+  .search-dropdown {
+    position: fixed;
+    left: 0;
+    width: 100vw;
+    min-width: 0;
+    border-radius: 0 0 14px 14px;
+    max-height: 50vh;
+  }
 }

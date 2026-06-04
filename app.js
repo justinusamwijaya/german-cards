@@ -1021,6 +1021,11 @@ function searchCards(query) {
 
 function renderSearchDropdown(results, query) {
   const dd = $("search-dropdown");
+  if (window.innerWidth <= 600) {
+    dd.style.top = document.querySelector("#view-study header").getBoundingClientRect().bottom + "px";
+  } else {
+    dd.style.top = "";
+  }
   if (!results.length) {
     dd.innerHTML = '<div class="search-no-results">No results</div>';
     dd.classList.remove("hidden");
