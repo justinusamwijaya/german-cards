@@ -1258,6 +1258,17 @@ function init() {
       $("search-dropdown").classList.add("hidden");
   });
 
+  // Hamburger menu (mobile)
+  const _headerRight = document.querySelector("#view-study .header-right");
+  $("btn-hamburger").addEventListener("click", (e) => {
+    e.stopPropagation();
+    _headerRight.classList.toggle("open");
+  });
+  document.addEventListener("click", (e) => {
+    if (!_headerRight.contains(e.target) && e.target !== $("btn-hamburger"))
+      _headerRight.classList.remove("open");
+  });
+
   updateStudyHeader();
   switchDeck("nouns");
 }

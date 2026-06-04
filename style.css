@@ -986,3 +986,52 @@ body {
   color: #bbb;
   font-size: .85rem;
 }
+
+/* ── Mobile hamburger menu ────────────────────────────────────── */
+
+.hamburger-btn {
+  display: none;
+  font-size: 1.15rem;
+  padding: .3rem .6rem;
+  flex-shrink: 0;
+  order: 99;
+}
+
+@media (max-width: 600px) {
+  #view-study header {
+    position: relative;
+    flex-wrap: nowrap;
+    gap: .4rem;
+  }
+
+  .hamburger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .search-wrap {
+    max-width: none;
+    flex: 1;
+  }
+
+  .header-right {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #efefef;
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    padding: .65rem 1.25rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+    z-index: 20;
+    align-items: center;
+  }
+
+  .header-right.open {
+    display: flex;
+  }
+}
