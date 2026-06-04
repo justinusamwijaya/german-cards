@@ -12,37 +12,44 @@
   <div id="view-study" class="view active">
 
     <header>
-      <!-- Group study mode: back + group name -->
-      <button class="header-btn hidden" id="btn-back-groups">← Groups</button>
-      <span class="group-mode-label hidden" id="group-mode-label"></span>
-
-      <!-- Sliding pill toggle -->
-      <div class="deck-toggle" id="deck-toggle">
-        <button class="toggle-opt active" data-deck="nouns">Noun</button>
-        <button class="toggle-opt" data-deck="verbs">Verb</button>
-        <div class="toggle-slider"></div>
+      <!-- Group title strip (navy, shown only in group study mode) -->
+      <div id="group-title-bar" class="hidden">
+        <span id="group-mode-label"></span>
       </div>
 
-      <!-- Search -->
-      <div class="search-wrap" id="search-wrap">
-        <input type="text" id="search-input" placeholder="Search anything…" autocomplete="off" spellcheck="false">
-        <div class="search-dropdown hidden" id="search-dropdown"></div>
-      </div>
+      <!-- Main nav row -->
+      <div class="header-nav">
+        <!-- Back button (group mode) -->
+        <button class="hidden" id="btn-back-groups" title="Back to Groups">‹</button>
 
-      <!-- Hamburger (mobile only) -->
-      <button class="header-btn hamburger-btn" id="btn-hamburger" aria-label="Menu">☰</button>
+        <!-- Sliding pill toggle -->
+        <div class="deck-toggle" id="deck-toggle">
+          <button class="toggle-opt active" data-deck="nouns">Noun</button>
+          <button class="toggle-opt" data-deck="verbs">Verb</button>
+          <div class="toggle-slider"></div>
+        </div>
 
-      <!-- Right side controls -->
-      <div class="header-right">
-        <span id="card-counter"></span>
-        <label class="shuffle-label" title="Shuffle">
-          <input type="checkbox" id="shuffle-toggle"> Shuffle
-        </label>
-        <button class="header-btn primary" id="btn-add" title="Add card">+</button>
-        <button class="header-btn" id="btn-export" title="Export to vocab.txt">↓</button>
-        <label class="header-btn-label" for="input-import" title="Import vocab.txt">↑</label>
-        <input type="file" id="input-import" accept=".txt,.json">
-        <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
+        <!-- Search -->
+        <div class="search-wrap" id="search-wrap">
+          <input type="text" id="search-input" placeholder="Search anything…" autocomplete="off" spellcheck="false">
+          <div class="search-dropdown hidden" id="search-dropdown"></div>
+        </div>
+
+        <!-- Hamburger (mobile only) -->
+        <button class="header-btn hamburger-btn" id="btn-hamburger" aria-label="Menu">☰</button>
+
+        <!-- Right side controls -->
+        <div class="header-right">
+          <span id="card-counter"></span>
+          <label class="shuffle-label" title="Shuffle">
+            <input type="checkbox" id="shuffle-toggle"> Shuffle
+          </label>
+          <button class="header-btn primary" id="btn-add" title="Add card">+</button>
+          <button class="header-btn" id="btn-export" title="Export to vocab.txt">↓</button>
+          <label class="header-btn-label" for="input-import" title="Import vocab.txt">↑</label>
+          <input type="file" id="input-import" accept=".txt,.json">
+          <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
+        </div>
       </div>
     </header>
 

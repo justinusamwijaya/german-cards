@@ -22,16 +22,54 @@ body {
 
 #view-study header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: .65rem 1.25rem;
+  flex-direction: column;
+  align-items: stretch;
   background: white;
   box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  gap: .5rem;
   flex-shrink: 0;
   width: 100%;
   min-width: 0;
 }
+
+/* Navy title strip shown in group study mode */
+#group-title-bar {
+  background: #1a3c5e;
+  color: rgba(255,255,255,.88);
+  text-align: center;
+  padding: .25rem 1.25rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Main nav row inside header */
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .65rem 1.25rem;
+  gap: .5rem;
+  min-width: 0;
+}
+
+/* Chevron back button */
+#btn-back-groups {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: #1a3c5e;
+  padding: 0 .15rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  font-weight: 300;
+  transition: color .15s;
+}
+#btn-back-groups:hover { color: #142d47; }
 
 /* ── Deck Toggle (sliding pill) ───────────────────────────────── */
 
@@ -734,17 +772,6 @@ body {
 
 /* ── Group Mode (study header) ────────────────────────────── */
 
-.group-mode-label {
-  font-weight: 700;
-  font-size: .88rem;
-  color: #1a3c5e;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 130px;
-  flex-shrink: 1;
-}
-
 /* ── Groups View ──────────────────────────────────────────── */
 
 #view-groups header {
@@ -1043,7 +1070,7 @@ body {
 }
 
 @media (max-width: 600px) {
-  #view-study header {
+  .header-nav {
     position: relative;
     flex-wrap: nowrap;
     gap: .4rem;

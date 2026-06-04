@@ -323,7 +323,7 @@ function openGroup(groupId) {
 function updateStudyHeader() {
   const inGroup = state.viewMode === "group-study";
   $("btn-back-groups").classList.toggle("hidden", !inGroup);
-  $("group-mode-label").classList.toggle("hidden", !inGroup);
+  $("group-title-bar").classList.toggle("hidden", !inGroup);
   $("btn-groups").classList.toggle("hidden", inGroup);
   if (inGroup) {
     const data = loadData();
