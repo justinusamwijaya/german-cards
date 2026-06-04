@@ -987,6 +987,51 @@ body {
   font-size: .85rem;
 }
 
+/* ── Mobile modals (bottom sheet) ────────────────────────────── */
+
+@media (max-width: 600px) {
+  #modal-overlay,
+  #modal-group-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  #modal-overlay .modal,
+  #modal-group-overlay .modal {
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem 1.25rem 1.25rem;
+    max-height: 92vh;
+  }
+
+  /* Group modal: make picker list fill remaining height */
+  #modal-group-overlay .modal {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #modal-group-overlay .modal > h2,
+  #modal-group-overlay .form-group,
+  #modal-group-overlay .modal-actions {
+    flex-shrink: 0;
+  }
+
+  #modal-group-overlay .card-picker {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #card-picker-list {
+    flex: 1;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
 /* ── Mobile hamburger menu ────────────────────────────────────── */
 
 .hamburger-btn {
