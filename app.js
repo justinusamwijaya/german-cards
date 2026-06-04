@@ -4,7 +4,7 @@ const STORAGE_KEY = "germancards";
 
 // ── Gist config (fill in to enable GitHub Pages sync) ─────────────────────────
 const GIST_ID = "f9f86c5e14e3c389ff922777d733b174"; // your Gist ID from gist.github.com/{user}/{id}
-const GIST_TOKEN = "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"; // GitHub PAT with `gist` scope
+const GIST_TOKEN = "__GIST_TOKEN__"; // replaced by GitHub Actions at deploy time
 const GIST_FILE = "vocab.txt";
 
 const SEED = {
