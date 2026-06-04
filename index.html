@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>German Cards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Single Study Screen ───────────────────────────────── -->
+  <div id="view-study" class="view active">
+
+    <header>
+      <!-- Group study mode: back + group name -->
+      <button class="header-btn hidden" id="btn-back-groups">← Groups</button>
+      <span class="group-mode-label hidden" id="group-mode-label"></span>
+
+      <!-- Sliding pill toggle -->
+      <div class="deck-toggle" id="deck-toggle">
+        <button class="toggle-opt active" data-deck="nouns">Noun</button>
+        <button class="toggle-opt" data-deck="verbs">Verb</button>
+        <div class="toggle-slider"></div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap" id="search-wrap">
+        <input type="text" id="search-input" placeholder="Search anything…" autocomplete="off" spellcheck="false">
+        <div class="search-dropdown hidden" id="search-dropdown"></div>
+      </div>
+
+      <!-- Right side controls -->
+      <div class="header-right">
+        <span id="card-counter"></span>
+        <label class="shuffle-label" title="Shuffle">
+          <input type="checkbox" id="shuffle-toggle"> Shuffle
+        </label>
+        <button class="header-btn primary" id="btn-add" title="Add card">+</button>
+        <button class="header-btn" id="btn-export" title="Export to vocab.txt">↓</button>
+        <label class="header-btn-label" for="input-import" title="Import vocab.txt">↑</label>
+        <input type="file" id="input-import" accept=".txt,.json">
+        <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
+      </div>
+    </header>
+
+    <!-- Card area (hidden when summary shows) -->
+    <div id="study-content" class="study-main">
+      <div class="card-scene">
+        <div class="card-inner" id="card-inner">
+          <div class="card-front" id="card-front"></div>
+          <div class="card-back"  id="card-back"></div>
+        </div>
+      </div>
+
+      <!-- Edit / Delete row (fixed height slot) -->
+      <div class="card-actions-row">
+        <div class="card-actions" id="card-actions">
+          <button id="btn-edit-card">✏️ Edit</button>
+          <button id="btn-delete-card">🗑️ Delete</button>
+        </div>
+        <div id="delete-confirm" class="hidden">
+          <span id="delete-confirm-text">Delete this card?</span>
+          <button id="btn-confirm-delete">Yes</button>
+          <button id="btn-cancel-delete">No</button>
+        </div>
+      </div>
+
+      <!-- Prev / Knew / Didn't / Next -->
+      <div class="study-nav">
+        <button id="btn-prev">← Prev</button>
+        <div class="knew-buttons">
+          <button id="btn-knew">✓ Knew it</button>
+          <button id="btn-didnt">✗ Didn't</button>
+        </div>
+        <button id="btn-next">Next →</button>
+      </div>
+
+      <!-- Score line + reset -->
+      <div id="score-line">
+        <span id="score-knew">✓ 0</span>
+        <span id="score-didnt">✗ 0</span>
+        <span id="score-total"></span>
+        <button id="btn-reset" title="Reset progress">↺ Reset</button>
+      </div>
+
+      <!-- Combine both decks -->
+      <button id="btn-combine">🔀 Combine Cards</button>
+
+      <!-- Revision mode banner -->
+      <div id="revision-banner" class="hidden">
+        Revision mode active &nbsp;·&nbsp;
+        <button id="btn-clear-revision">Refill all cards</button>
+      </div>
+    </div>
+
+    <!-- Session summary -->
+    <div class="summary-wrap hidden" id="summary-wrap">
+      <div id="session-summary">
+        <h2>Session complete!</h2>
+        <p id="summary-text"></p>
+        <div id="summary-missed-list"></div>
+        <div class="summary-buttons">
+          <button id="btn-restart">Restart deck</button>
+          <button id="btn-retry-missed" class="hidden">↺ Retry missed</button>
+          <button id="btn-refill-deck" class="hidden">Refill all cards</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Groups Screen ─────────────────────────────────────── -->
+  <div id="view-groups" class="view">
+    <header>
+      <button class="header-btn" id="btn-back-library">← Library</button>
+      <h1 class="groups-title">Groups</h1>
+      <button class="header-btn primary" id="btn-new-group">+ New Group</button>
+    </header>
+    <div id="groups-list" class="groups-list"></div>
+  </div>
+
+  <!-- ── Add / Edit Card Modal ─────────────────────────────── -->
+  <div id="modal-overlay" class="hidden">
+    <div class="modal">
+      <h2 id="modal-title">Add Card</h2>
+
+      <div class="type-selector">
+        <button class="type-btn active" data-type="verb">Verb</button>
+        <button class="type-btn" data-type="noun">Noun</button>
+      </div>
+
+      <!-- Verb Form -->
+      <div id="verb-form">
+        <div class="form-group">
+          <label>Infinitiv</label>
+          <input type="text" id="verb-name" placeholder="e.g. gehen">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="verb-type">
+            <option value="regular">Regular</option>
+            <option value="irregular">Irregular</option>
+          </select>
+        </div>
+        <label style="font-size:.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.4rem;">Conjugations</label>
+        <div class="conjugation-grid">
+          <span class="conj-label">ich</span>      <input type="text" id="conj-ich"  placeholder="gehe">
+          <span class="conj-label">du</span>       <input type="text" id="conj-du"   placeholder="gehst">
+          <span class="conj-label">er/sie/es</span><input type="text" id="conj-er"   placeholder="geht">
+          <span class="conj-label">wir</span>      <input type="text" id="conj-wir"  placeholder="gehen">
+          <span class="conj-label">ihr</span>      <input type="text" id="conj-ihr"  placeholder="geht">
+          <span class="conj-label">Sie</span>      <input type="text" id="conj-sie"  placeholder="gehen">
+        </div>
+        <div class="form-group">
+          <label>Meaning (English)</label>
+          <input type="text" id="verb-eng" placeholder="to go">
+        </div>
+        <div class="form-group">
+          <label>Meaning (Indonesian)</label>
+          <input type="text" id="verb-ind" placeholder="pergi">
+        </div>
+      </div>
+
+      <!-- Noun Form -->
+      <div id="noun-form" class="hidden">
+        <div class="form-group">
+          <label>Nomen</label>
+          <input type="text" id="noun-name" placeholder="e.g. Hund">
+        </div>
+        <div class="form-group">
+          <label>Plural</label>
+          <input type="text" id="noun-plural" placeholder="e.g. Hunde">
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="noun-gender">
+            <option value="maskulin">Maskulin (der)</option>
+            <option value="feminin">Feminin (die)</option>
+            <option value="netral">Netral (das)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Meaning (English)</label>
+          <input type="text" id="noun-eng" placeholder="dog">
+        </div>
+        <div class="form-group">
+          <label>Meaning (Indonesian)</label>
+          <input type="text" id="noun-ind" placeholder="anjing">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-modal-save">Save</button>
+        <button id="btn-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Group Create / Edit Modal ─────────────────────────── -->
+  <div id="modal-group-overlay" class="hidden">
+    <div class="modal">
+      <h2 id="modal-group-title">New Group</h2>
+
+      <div class="form-group">
+        <label>Group Name</label>
+        <input type="text" id="group-name-input" placeholder="e.g. Week 1 Vocab">
+      </div>
+
+      <div class="card-picker">
+        <div class="card-picker-header">
+          <span class="picker-label">Cards</span>
+          <input type="text" id="card-picker-search" placeholder="Filter cards…" autocomplete="off" spellcheck="false">
+        </div>
+        <div id="card-picker-list"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-group-save">Save</button>
+        <button id="btn-group-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
