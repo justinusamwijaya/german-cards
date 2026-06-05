@@ -936,7 +936,7 @@ function renderGroupsList() {
   list.innerHTML = data.groups
     .map((g) => {
       const ids = new Set(g.cardIds);
-      const count = [...data.verbs, ...data.nouns, ...data.adjectives].filter((c) =>
+      const count = [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs].filter((c) =>
         ids.has(c.id),
       ).length;
       return `<div class="group-row" data-id="${escapeHtml(g.id)}">
