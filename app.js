@@ -1332,6 +1332,17 @@ function init() {
       else if (!$("modal-overlay").classList.contains("hidden")) closeModal();
       else closeSearch();
     }
+    if (e.key === "Enter" && !$("modal-overlay").classList.contains("hidden")) {
+      if (document.activeElement.tagName !== "SELECT") {
+        if (e.shiftKey) {
+          const type = state.modalType;
+          saveCard();
+          openModal(type);
+        } else {
+          saveCard();
+        }
+      }
+    }
   });
 
   // Search
