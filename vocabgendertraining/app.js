@@ -1,4 +1,7 @@
-const ARTICLES = { maskulin: 'der', feminin: 'die', netral: 'das', neutrum: 'das' };
+const ARTICLES  = { maskulin: 'der', feminin: 'die', netral: 'das', neutrum: 'das' };
+const GIST_ID   = "f9f86c5e14e3c389ff922777d733b174";
+const GIST_TOKEN = "__GIST_TOKEN__";
+const GIST_FILE = "vocab.txt";
 
 const elGroupSelect   = document.getElementById('group-select');
 const elCard          = document.getElementById('card');
@@ -33,8 +36,21 @@ function shuffle(arr) {
 }
 
 async function loadData() {
-  const res  = await fetch('../vocab.txt');
-  const data = await res.json();
+  let data;
+  if (GIST_ID) {
+    const res = await fetch(
+      `https://api.github.com/gists/${GIST_ID}`,
+      GIST_TOKEN ? { headers: { Authorization: `token ${GIST_TOKEN}` } } : {},
+    );
+    if (res.ok) {
+      const gist = await res.json();
+      data = JSON.parse(gist.files[GIST_FILE].content);
+    }
+  } else {
+    const res = await fetch('../vocab.txt?t=' + Date.now());
+    if (res.ok) data = await res.json();
+  }
+  if (!data) return;
 
   allNouns = (data.nouns || []).filter(n => n.gender && ARTICLES[n.gender]);
   groups   = (data.groups || []);
