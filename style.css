@@ -54,6 +54,7 @@ body {
   padding: .65rem 1.25rem;
   gap: .5rem;
   min-width: 0;
+  position: relative;
 }
 
 /* Chevron back button */
@@ -140,6 +141,7 @@ body {
   align-items: center;
   gap: .4rem;
   flex-shrink: 1;
+  margin-left: auto;
   min-width: 0;
 }
 
@@ -736,10 +738,12 @@ body {
 /* ── Search ───────────────────────────────────────────────────── */
 
 .search-wrap {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  max-width: 240px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(42%, 460px);
+  min-width: 180px;
+  z-index: 5;
 }
 
 #search-input {
@@ -1130,8 +1134,14 @@ body {
   }
 
   .search-wrap {
+    position: relative;
+    left: auto;
+    transform: none;
+    width: auto;
     max-width: none;
+    min-width: 0;
     flex: 1;
+    z-index: auto;
   }
 
   .header-right {
