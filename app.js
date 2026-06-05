@@ -277,6 +277,7 @@ let state = {
   modalType: "noun",
   viewMode: "library", // 'library' | 'group-study'
   activeGroupId: null,
+  shuffleEnabled: false,
 };
 
 // ── DOM helpers ───────────────────────────────────────────────────────────────
@@ -401,7 +402,7 @@ function startDeck(deckName) {
   state.didnt = 0;
   state.answers = {};
 
-  if ($("shuffle-toggle").checked) shuffle(state.cards);
+  if (state.shuffleEnabled) shuffle(state.cards);
 
   $("study-content").classList.remove("hidden");
   $("summary-wrap").classList.add("hidden");
@@ -1345,7 +1346,23 @@ function init() {
   });
 
   // Shuffle
-  $("shuffle-toggle").addEventListener("change", () => startDeck(state.deck));
+  function setShuffleUI(enabled) {
+    $("shuffle-btn").classList.toggle("active", enabled);
+    $("shuffle-btn").textContent = enabled ? "↺ Shuffle" : "Shuffle";
+    $("shuffle-off").classList.toggle("hidden", !enabled);
+  }
+
+  $("shuffle-btn").addEventListener("click", () => {
+    state.shuffleEnabled = true;
+    setShuffleUI(true);
+    startDeck(state.deck);
+  });
+
+  $("shuffle-off").addEventListener("click", () => {
+    state.shuffleEnabled = false;
+    setShuffleUI(false);
+    startDeck(state.deck);
+  });
 
   // Add card
   $("btn-add").addEventListener("click", () => {

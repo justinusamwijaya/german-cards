@@ -150,16 +150,47 @@ body {
   text-align: right;
 }
 
-.shuffle-label {
+.shuffle-ctrl {
   display: flex;
   align-items: center;
-  gap: .3rem;
-  font-size: .8rem;
-  color: #777;
-  cursor: pointer;
-  font-weight: 600;
-  white-space: nowrap;
+  gap: 3px;
 }
+
+.shuffle-btn {
+  border: none;
+  background: #ede9e0;
+  border-radius: 50px;
+  padding: .35rem .9rem;
+  font-weight: 700;
+  font-size: .85rem;
+  color: #888;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+
+.shuffle-btn.active {
+  background: #1a3c5e;
+  color: #fff;
+}
+
+.shuffle-off {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: #bbb;
+  color: #fff;
+  font-size: .65rem;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  padding: 0;
+  transition: background .15s;
+}
+
+.shuffle-off:hover { background: #999; }
 
 .header-btn {
   background: none;
