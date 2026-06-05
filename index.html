@@ -33,13 +33,15 @@
 
         <!-- Right side controls -->
         <div class="header-right">
-          <!-- Sliding pill toggle -->
-          <div class="deck-toggle" id="deck-toggle">
-            <button class="toggle-opt active" data-deck="nouns">Noun</button>
-            <button class="toggle-opt" data-deck="verbs">Verb</button>
-            <button class="toggle-opt" data-deck="adjectives">Adj</button>
-            <button class="toggle-opt" data-deck="adverbs">Adv</button>
-            <div class="toggle-slider"></div>
+          <!-- Deck cycle button + dropdown -->
+          <div class="deck-switcher" id="deck-switcher">
+            <button class="deck-cycle-btn" id="deck-cycle-btn">Nouns</button>
+            <div class="deck-dropdown hidden" id="deck-dropdown">
+              <button class="deck-drop-opt" data-deck="nouns">Nouns</button>
+              <button class="deck-drop-opt" data-deck="verbs">Verbs</button>
+              <button class="deck-drop-opt" data-deck="adjectives">Adjectives</button>
+              <button class="deck-drop-opt" data-deck="adverbs">Adverbs</button>
+            </div>
           </div>
           <span id="card-counter"></span>
           <label class="shuffle-label" title="Shuffle">

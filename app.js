@@ -346,30 +346,16 @@ function updateStudyHeader() {
 
 // ── Deck Switching ────────────────────────────────────────────────────────────
 
+const DECK_CYCLE = ["nouns", "verbs", "adjectives", "adverbs"];
+const DECK_LABELS = { nouns: "Nouns", verbs: "Verbs", adjectives: "Adjectives", adverbs: "Adverbs", combined: "All" };
+
+function updateDeckBtn() {
+  $("deck-cycle-btn").textContent = DECK_LABELS[state.deck] || state.deck;
+}
+
 function switchDeck(deckName) {
   state.deck = deckName;
-
-  const toggle = $("deck-toggle");
-  document
-    .querySelectorAll(".toggle-opt")
-    .forEach((opt) => opt.classList.remove("active"));
-  toggle.classList.remove("verb-active");
-  toggle.classList.remove("adj-active");
-  toggle.classList.remove("adv-active");
-
-  if (deckName === "nouns") {
-    document.querySelector('[data-deck="nouns"]').classList.add("active");
-  } else if (deckName === "verbs") {
-    document.querySelector('[data-deck="verbs"]').classList.add("active");
-    toggle.classList.add("verb-active");
-  } else if (deckName === "adjectives") {
-    document.querySelector('[data-deck="adjectives"]').classList.add("active");
-    toggle.classList.add("adj-active");
-  } else if (deckName === "adverbs") {
-    document.querySelector('[data-deck="adverbs"]').classList.add("active");
-    toggle.classList.add("adv-active");
-  }
-
+  updateDeckBtn();
   $("btn-combine").classList.toggle("active", deckName === "combined");
   startDeck(deckName);
 }
@@ -1248,9 +1234,109 @@ function closeSearch() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 function init() {
-  // Deck toggle
-  document.querySelectorAll(".toggle-opt").forEach((btn) => {
-    btn.addEventListener("click", () => switchDeck(btn.dataset.deck));
+  // ── Deck cycle button (tap = cycle, hold + drag + release = pick) ─
+  const LONG_PRESS_MS = 350;
+  let _deckTimer = null;
+  let _deckLong = false;
+  let _deckHeld = false;
+
+  function highlightDeckOpt(el) {
+    $("deck-dropdown").querySelectorAll(".deck-drop-opt").forEach((opt) => {
+      opt.classList.toggle("highlighted", opt === el || opt.contains(el));
+    });
+  }
+
+  function clearDeckHighlight() {
+    $("deck-dropdown").querySelectorAll(".deck-drop-opt").forEach((o) => o.classList.remove("highlighted"));
+  }
+
+  function showDeckDropdown() {
+    $("deck-dropdown").querySelectorAll(".deck-drop-opt").forEach((opt) => {
+      opt.classList.toggle("active", opt.dataset.deck === state.deck);
+    });
+    $("deck-dropdown").classList.remove("hidden");
+  }
+
+  function hideDeckDropdown() {
+    $("deck-dropdown").classList.add("hidden");
+    clearDeckHighlight();
+  }
+
+  function nextDeck() {
+    const cur = DECK_CYCLE.includes(state.deck) ? state.deck : "nouns";
+    switchDeck(DECK_CYCLE[(DECK_CYCLE.indexOf(cur) + 1) % DECK_CYCLE.length]);
+  }
+
+  const cycleBtn = $("deck-cycle-btn");
+
+  // ── Mouse ────────────────────────────────────────────────────────
+  cycleBtn.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    _deckHeld = true;
+    _deckLong = false;
+    _deckTimer = setTimeout(() => {
+      _deckLong = true;
+      showDeckDropdown();
+    }, LONG_PRESS_MS);
+  });
+
+  // Track cursor for highlight while dragging
+  document.addEventListener("mousemove", (e) => {
+    if (!_deckHeld || !_deckLong) return;
+    highlightDeckOpt(e.target);
+  });
+
+  // Release anywhere — this is the key fix for drag-to-select
+  document.addEventListener("mouseup", (e) => {
+    if (!_deckHeld) return;
+    _deckHeld = false;
+    clearTimeout(_deckTimer);
+    if (!_deckLong) {
+      nextDeck();
+    } else {
+      const opt = e.target.closest(".deck-drop-opt");
+      if (opt) switchDeck(opt.dataset.deck);
+      hideDeckDropdown();
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!$("deck-switcher").contains(e.target)) hideDeckDropdown();
+  });
+
+  // ── Touch ────────────────────────────────────────────────────────
+  cycleBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    _deckLong = false;
+    _deckTimer = setTimeout(() => {
+      _deckLong = true;
+      showDeckDropdown();
+    }, LONG_PRESS_MS);
+  }, { passive: false });
+
+  cycleBtn.addEventListener("touchmove", (e) => {
+    if (!_deckLong) return;
+    const t = e.touches[0];
+    highlightDeckOpt(document.elementFromPoint(t.clientX, t.clientY));
+  }, { passive: true });
+
+  cycleBtn.addEventListener("touchend", (e) => {
+    clearTimeout(_deckTimer);
+    if (!_deckLong) {
+      nextDeck();
+      return;
+    }
+    const t = e.changedTouches[0];
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const opt = el && el.closest(".deck-drop-opt");
+    if (opt) switchDeck(opt.dataset.deck);
+    hideDeckDropdown();
+  }, { passive: true });
+
+  cycleBtn.addEventListener("touchcancel", () => {
+    clearTimeout(_deckTimer);
+    _deckLong = false;
   });
 
   // Combine button

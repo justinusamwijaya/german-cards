@@ -71,62 +71,66 @@ body {
 }
 #btn-back-groups:hover { color: #142d47; }
 
-/* ── Deck Toggle (sliding pill) ───────────────────────────────── */
+/* ── Deck Cycle Button ───────────────────────────────────────── */
 
-.deck-toggle {
+.deck-switcher {
   position: relative;
-  display: flex;
-  background: #ede9e0;
-  border-radius: 50px;
-  padding: 3px;
   flex-shrink: 0;
 }
 
-.toggle-opt {
-  position: relative;
-  z-index: 1;
-  flex: 1;
+.deck-cycle-btn {
   border: none;
-  background: transparent;
-  padding: .35rem 1.25rem;
+  background: #ede9e0;
   border-radius: 50px;
+  padding: .4rem 1.1rem;
   font-weight: 700;
   cursor: pointer;
   font-size: .9rem;
-  color: #aaa;
-  transition: color .25s;
-  white-space: nowrap;
+  color: #1a3c5e;
   font-family: inherit;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background .15s;
+  touch-action: none;
 }
 
-.toggle-opt.active { color: #1a3c5e; }
+.deck-cycle-btn:hover { background: #ddd8cc; }
+.deck-cycle-btn:active { background: #ccc8be; }
 
-.toggle-slider {
+.deck-dropdown {
   position: absolute;
-  top: 3px;
-  bottom: 3px;
-  left: 3px;
-  width: calc(33.33% - 3px);
+  top: calc(100% + 6px);
+  left: 0;
   background: white;
-  border-radius: 50px;
-  box-shadow: 0 1px 6px rgba(0,0,0,.15);
-  transition: transform .25s cubic-bezier(.4, 0, .2, 1);
-  pointer-events: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  overflow: hidden;
+  min-width: 130px;
+  z-index: 200;
 }
 
-/* Slide pill to Verb position */
-.deck-toggle.verb-active .toggle-slider {
-  transform: translateX(100%);
+.deck-drop-opt {
+  display: block;
+  width: 100%;
+  padding: .6rem 1.1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-weight: 600;
+  font-size: .9rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: #333;
+  transition: background .1s;
 }
 
-/* Slide pill to Adjective position */
-.deck-toggle.adj-active .toggle-slider {
-  transform: translateX(200%);
-}
+.deck-drop-opt:hover,
+.deck-drop-opt.highlighted { background: #f0ece4; }
 
-/* Slide pill to Adverb position */
-.deck-toggle.adv-active .toggle-slider {
-  transform: translateX(300%);
+.deck-drop-opt.active {
+  color: #1a3c5e;
+  background: #e8f0fe;
 }
 
 /* ── Header Right ─────────────────────────────────────────────── */
