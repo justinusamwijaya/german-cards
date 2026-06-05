@@ -20,7 +20,7 @@ jobs:
 
       - name: Inject Gist token
         run: |
-          sed -i "s/__GIST_TOKEN__/${{ secrets.GIST_TOKEN }}/g" app.js
+          sed -i "s/__GIST_TOKEN__/${{ secrets.GIST_TOKEN }}/g" data.js
           sed -i "s/__GIST_TOKEN__/${{ secrets.GIST_TOKEN }}/g" vocabgendertraining/app.js
 
       - uses: actions/configure-pages@v5
