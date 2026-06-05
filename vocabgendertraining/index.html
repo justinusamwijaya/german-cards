@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gender Training</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="view active">
+
+    <header>
+      <div class="header-nav">
+        <a href="../index.html" class="header-btn" style="text-decoration:none;font-size:1.3rem;padding:.2rem .55rem;line-height:1;">‹</a>
+        <span style="font-weight:800;color:#1a3c5e;font-size:1rem;flex:1;">Gender Training</span>
+        <select class="group-select" id="group-select">
+          <option value="all">All Nouns</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="study-main">
+
+      <!-- Training area: score + card + buttons + progress -->
+      <div id="training-area">
+
+        <div class="score-bar">
+          <span>✓ <span class="s-correct" id="score-correct">0</span></span>
+          <span>✗ <span class="s-wrong" id="score-wrong">0</span></span>
+          <span>Left: <span class="s-remain" id="score-remain">0</span></span>
+        </div>
+
+        <div class="gt-card" id="card">
+          <div class="card-front-inner">
+            <div class="card-word">
+              <span class="card-article" id="card-blank">___</span> <span id="card-noun"></span>
+            </div>
+            <div class="card-feedback" id="card-feedback"></div>
+          </div>
+        </div>
+
+        <div class="article-btns">
+          <button class="article-btn" data-article="der">der</button>
+          <button class="article-btn" data-article="die">die</button>
+          <button class="article-btn" data-article="das">das</button>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+
+      </div>
+
+      <!-- Empty state -->
+      <p class="empty-msg" id="empty-msg" style="display:none">No nouns in this group.</p>
+
+      <!-- Summary -->
+      <div class="summary" id="summary">
+        <div class="summary-score" id="summary-score">0%</div>
+        <div class="summary-label">Session complete</div>
+        <div class="summary-detail" id="summary-detail"></div>
+        <button class="btn-retry" id="btn-retry">Retry</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

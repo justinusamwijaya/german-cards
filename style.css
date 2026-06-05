@@ -106,7 +106,7 @@ body {
   top: 3px;
   bottom: 3px;
   left: 3px;
-  width: calc(50% - 3px);
+  width: calc(33.33% - 3px);
   background: white;
   border-radius: 50px;
   box-shadow: 0 1px 6px rgba(0,0,0,.15);
@@ -117,6 +117,11 @@ body {
 /* Slide pill to Verb position */
 .deck-toggle.verb-active .toggle-slider {
   transform: translateX(100%);
+}
+
+/* Slide pill to Adjective position */
+.deck-toggle.adj-active .toggle-slider {
+  transform: translateX(200%);
 }
 
 /* ── Header Right ─────────────────────────────────────────────── */
@@ -264,6 +269,7 @@ body {
 
 .noun-badge  { background: #e8f0fe; color: #1a3c9e; }
 .verb-badge  { background: #fce8e6; color: #9e1a1a; }
+.adj-badge   { background: #e6f4ea; color: #1a6b3c; }
 .reg-badge   { background: #e6f4ea; color: #1a7a3c; }
 .irreg-badge { background: #fff3e0; color: #b85c00; }
 .gender-m { background: #e8f0fe; color: #1a3c9e; }

@@ -1,0 +1,177 @@
+/* ── Header (main CSS scopes these to #view-study, so redeclare) ── */
+
+header {
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  flex-shrink: 0;
+}
+
+/* ── Group selector ──────────────────────────────────────────────── */
+
+.group-select {
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: .32rem .6rem;
+  font-size: .82rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: #555;
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .15s;
+  max-width: 160px;
+}
+.group-select:hover, .group-select:focus { border-color: #1a3c5e; }
+
+/* ── Training area ───────────────────────────────────────────────── */
+
+#training-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  width: 100%;
+}
+
+/* ── Score bar ───────────────────────────────────────────────────── */
+
+.score-bar {
+  display: flex;
+  gap: 1.5rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: #999;
+}
+.score-bar .s-correct { color: #16a34a; }
+.score-bar .s-wrong   { color: #dc2626; }
+.score-bar .s-remain  { color: #1a3c5e; }
+
+/* ── Static card (no flip) ───────────────────────────────────────── */
+
+.gt-card {
+  width: min(480px, 92vw);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 6px 32px rgba(0,0,0,.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  min-height: 160px;
+  transition: background .2s, box-shadow .2s;
+  user-select: none;
+}
+.gt-card.correct { background: #dcfce7; box-shadow: 0 6px 32px rgba(22,163,74,.18); }
+.gt-card.wrong   { background: #fee2e2; box-shadow: 0 6px 32px rgba(220,38,38,.18); }
+
+/* article-das color (der/die already in ../style.css) */
+.card-article.article-das { color: #16a34a; }
+
+.card-feedback {
+  font-size: .95rem;
+  font-weight: 700;
+  text-align: center;
+  min-height: 1.4em;
+  margin-top: .35rem;
+}
+.gt-card.correct .card-feedback { color: #15803d; }
+.gt-card.wrong   .card-feedback { color: #b91c1c; }
+
+/* ── Article buttons ─────────────────────────────────────────────── */
+
+.article-btns {
+  display: flex;
+  gap: .75rem;
+}
+
+.article-btn {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  padding: .65rem 1.6rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  color: #444;
+  transition: background .15s, border-color .15s, color .15s, transform .1s;
+  min-width: 80px;
+  text-align: center;
+}
+.article-btn[data-article="der"] { color: #3b82f6; border-color: #bfdbfe; }
+.article-btn[data-article="die"] { color: #ec4899; border-color: #fbcfe8; }
+.article-btn:not(:disabled):hover { background: #f0ece3; }
+.article-btn[data-article="der"]:not(:disabled):hover { border-color: #3b82f6; }
+.article-btn[data-article="die"]:not(:disabled):hover { border-color: #ec4899; }
+.article-btn:not(:disabled):active { transform: scale(.96); }
+.article-btn:disabled { cursor: default; opacity: .5; }
+.article-btn.correct-ans { background: #dcfce7; border-color: #16a34a; color: #15803d; opacity: 1; }
+.article-btn.wrong-ans   { background: #fee2e2; border-color: #dc2626; color: #b91c1c; opacity: 1; }
+
+/* ── Progress bar ────────────────────────────────────────────────── */
+
+.progress-wrap {
+  width: min(480px, 92vw);
+  height: 5px;
+  background: #e0e0e0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #1a3c5e;
+  border-radius: 99px;
+  transition: width .3s ease;
+}
+
+/* ── Summary ─────────────────────────────────────────────────────── */
+
+.summary {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+.summary.active { display: flex; }
+
+.summary-score {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1a3c5e;
+}
+.summary-label  { font-size: 1rem; color: #777; font-weight: 600; }
+.summary-detail { font-size: .9rem; color: #999; }
+
+.btn-retry {
+  margin-top: .5rem;
+  background: #1a3c5e;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: .7rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-retry:hover { background: #142d47; }
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+
+.empty-msg {
+  color: #aaa;
+  font-size: .95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .article-btn { padding: .6rem 1.1rem; font-size: 1rem; min-width: 68px; }
+  .group-select { max-width: 120px; font-size: .78rem; }
+}

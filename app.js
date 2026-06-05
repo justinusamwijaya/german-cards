@@ -201,6 +201,7 @@ const SEED = {
       meaning: { eng: "language", ind: "bahasa" },
     },
   ],
+  adjectives: [],
   groups: [],
 };
 
@@ -213,6 +214,7 @@ function loadData() {
   }
   const data = JSON.parse(raw);
   if (!data.groups) data.groups = [];
+  if (!data.adjectives) data.adjectives = [];
   return data;
 }
 
@@ -290,6 +292,10 @@ function isNounCard(card) {
   return card.gender !== undefined;
 }
 
+function isAdjectiveCard(card) {
+  return card.comparative !== undefined;
+}
+
 // ── View Navigation ───────────────────────────────────────────────────────────
 
 function showView(id) {
@@ -342,12 +348,16 @@ function switchDeck(deckName) {
     .querySelectorAll(".toggle-opt")
     .forEach((opt) => opt.classList.remove("active"));
   toggle.classList.remove("verb-active");
+  toggle.classList.remove("adj-active");
 
   if (deckName === "nouns") {
     document.querySelector('[data-deck="nouns"]').classList.add("active");
   } else if (deckName === "verbs") {
     document.querySelector('[data-deck="verbs"]').classList.add("active");
     toggle.classList.add("verb-active");
+  } else if (deckName === "adjectives") {
+    document.querySelector('[data-deck="adjectives"]').classList.add("active");
+    toggle.classList.add("adj-active");
   }
 
   $("btn-combine").classList.toggle("active", deckName === "combined");
@@ -360,19 +370,21 @@ function startDeck(deckName) {
   if (state.viewMode === "group-study") {
     const group = data.groups.find((g) => g.id === state.activeGroupId);
     const ids = new Set(group ? group.cardIds : []);
-    const groupCards = [...data.verbs, ...data.nouns].filter((c) =>
+    const groupCards = [...data.verbs, ...data.nouns, ...data.adjectives].filter((c) =>
       ids.has(c.id),
     );
     if (deckName === "combined") {
       state.cards = groupCards;
     } else if (deckName === "verbs") {
-      state.cards = groupCards.filter((c) => !isNounCard(c));
+      state.cards = groupCards.filter((c) => !isNounCard(c) && !isAdjectiveCard(c));
+    } else if (deckName === "adjectives") {
+      state.cards = groupCards.filter(isAdjectiveCard);
     } else {
       state.cards = groupCards.filter(isNounCard);
     }
   } else {
     if (deckName === "combined") {
-      state.cards = [...data.verbs, ...data.nouns];
+      state.cards = [...data.verbs, ...data.nouns, ...data.adjectives];
     } else {
       state.cards = [...data[deckName]];
     }
@@ -422,6 +434,8 @@ function renderCard() {
 
   if (isNounCard(card)) {
     renderNounCard(card);
+  } else if (isAdjectiveCard(card)) {
+    renderAdjectiveCard(card);
   } else {
     renderVerbCard(card);
   }
@@ -502,6 +516,38 @@ function renderVerbCard(verb) {
     </div>`;
 }
 
+function renderAdjectiveCard(adj) {
+  $("card-front").className = "card-front";
+  $("card-front").innerHTML = `
+    <div class="card-front-inner">
+      <span class="badge adj-badge">Adjektiv</span>
+      <div class="card-word">${adj.name}</div>
+      <div class="card-hint">hold to reveal</div>
+    </div>`;
+
+  $("card-back").innerHTML = `
+    <div class="back-content">
+      <div class="back-header">
+        <span class="badge adj-badge">Adjektiv</span>
+        <span class="back-word">${adj.name}</span>
+      </div>
+      <div class="back-row">
+        <span class="row-label">Komparativ</span>
+        <span>${adj.comparative || "—"}</span>
+      </div>
+      <div class="back-row">
+        <span class="row-label">Superlativ</span>
+        <span>${adj.superlative || "—"}</span>
+      </div>
+      <div class="back-row">
+        <span class="flag">🇬🇧</span><span>${adj.meaning.eng}</span>
+      </div>
+      <div class="back-row">
+        <span class="flag">🇮🇩</span><span>${adj.meaning.ind}</span>
+      </div>
+    </div>`;
+}
+
 function showSummary() {
   $("study-content").classList.add("hidden");
   $("summary-wrap").classList.remove("hidden");
@@ -563,6 +609,12 @@ function openModal(type, card = null) {
       });
       $("verb-eng").value = card.meaning.eng;
       $("verb-ind").value = card.meaning.ind;
+    } else if (type === "adjective") {
+      $("adj-name").value = card.name;
+      $("adj-comparative").value = card.comparative || "";
+      $("adj-superlative").value = card.superlative || "";
+      $("adj-eng").value = card.meaning.eng;
+      $("adj-ind").value = card.meaning.ind;
     } else {
       $("noun-name").value = card.name;
       $("noun-plural").value = card.plural;
@@ -573,7 +625,7 @@ function openModal(type, card = null) {
   }
 
   $("modal-overlay").classList.remove("hidden");
-  (type === "verb" ? $("verb-name") : $("noun-name")).focus();
+  (type === "verb" ? $("verb-name") : type === "adjective" ? $("adj-name") : $("noun-name")).focus();
 }
 
 function closeModal() {
@@ -590,6 +642,9 @@ function clearModal() {
   ["noun-name", "noun-plural", "noun-eng", "noun-ind"].forEach((id) => {
     $(id).value = "";
   });
+  ["adj-name", "adj-comparative", "adj-superlative", "adj-eng", "adj-ind"].forEach((id) => {
+    $(id).value = "";
+  });
   $("verb-type").value = "regular";
   $("noun-gender").value = "maskulin";
 }
@@ -598,6 +653,7 @@ function switchModalType(type) {
   state.modalType = type;
   $("verb-form").classList.toggle("hidden", type !== "verb");
   $("noun-form").classList.toggle("hidden", type !== "noun");
+  $("adjective-form").classList.toggle("hidden", type !== "adjective");
   document.querySelectorAll(".type-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
@@ -635,6 +691,30 @@ function saveCard() {
       if (idx !== -1) data.verbs[idx] = entry;
     } else {
       data.verbs.push(entry);
+    }
+  } else if (state.modalType === "adjective") {
+    const name = $("adj-name").value.trim();
+    if (!name) {
+      $("adj-name").focus();
+      return;
+    }
+
+    entry = {
+      id: state.editingId || genId(),
+      name,
+      comparative: $("adj-comparative").value.trim(),
+      superlative: $("adj-superlative").value.trim(),
+      meaning: {
+        eng: $("adj-eng").value.trim(),
+        ind: $("adj-ind").value.trim(),
+      },
+    };
+
+    if (state.editingId) {
+      const idx = data.adjectives.findIndex((a) => a.id === state.editingId);
+      if (idx !== -1) data.adjectives[idx] = entry;
+    } else {
+      data.adjectives.push(entry);
     }
   } else {
     const name = $("noun-name").value.trim();
@@ -677,18 +757,17 @@ function saveCard() {
   closeModal();
 
   if (state.editingId && state.deck) {
+    const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives" };
     const updated = loadData()[
       state.deck === "combined"
-        ? state.modalType === "verb"
-          ? "verbs"
-          : "nouns"
+        ? typeToKey[state.modalType] || "nouns"
         : state.deck
     ].find((c) => c.id === state.editingId);
     if (updated) state.cards[state.index] = updated;
     renderCard();
   } else {
-    const targetDeck = state.modalType === "verb" ? "verbs" : "nouns";
-    switchDeck(targetDeck);
+    const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives" };
+    switchDeck(typeToKey[state.modalType] || "nouns");
   }
 }
 
@@ -699,7 +778,7 @@ function deleteCard() {
   }
   const card = state.cards[state.index];
   const data = loadData();
-  const listKey = isNounCard(card) ? "nouns" : "verbs";
+  const listKey = isNounCard(card) ? "nouns" : isAdjectiveCard(card) ? "adjectives" : "verbs";
   data[listKey] = data[listKey].filter((c) => c.id !== card.id);
   saveData(data);
   state.cards.splice(state.index, 1);
@@ -748,6 +827,7 @@ function importData(file) {
       if (!Array.isArray(data.verbs) || !Array.isArray(data.nouns))
         throw new Error();
       if (!data.groups) data.groups = [];
+      if (!data.adjectives) data.adjectives = [];
       saveData(data);
       switchDeck(state.deck);
     } catch {
@@ -793,7 +873,7 @@ function renderGroupsList() {
   list.innerHTML = data.groups
     .map((g) => {
       const ids = new Set(g.cardIds);
-      const count = [...data.verbs, ...data.nouns].filter((c) =>
+      const count = [...data.verbs, ...data.nouns, ...data.adjectives].filter((c) =>
         ids.has(c.id),
       ).length;
       return `<div class="group-row" data-id="${escapeHtml(g.id)}">
@@ -883,11 +963,12 @@ function renderCardPicker(query) {
   const q = normalizeSearch(query).trim();
 
   const allCards = [
-    ...data.verbs.map((c) => ({ ...c, _isNoun: false })),
-    ...data.nouns.map((c) => ({ ...c, _isNoun: true })),
+    ...data.verbs.map((c) => ({ ...c, _type: "verb" })),
+    ...data.nouns.map((c) => ({ ...c, _type: "noun" })),
+    ...data.adjectives.map((c) => ({ ...c, _type: "adjective" })),
   ].filter((c) => {
     if (!q) return true;
-    const prefix = c._isNoun ? (ARTICLES[c.gender] || "") + " " : "";
+    const prefix = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
     return (
       normalizeSearch(prefix + c.name).includes(q) ||
       normalizeSearch(c.meaning.eng).includes(q) ||
@@ -904,9 +985,9 @@ function renderCardPicker(query) {
   list.innerHTML = allCards
     .map((c) => {
       const sel = _groupSelectedIds.has(c.id);
-      const badgeCls = c._isNoun ? "noun-badge" : "verb-badge";
-      const typeLabel = c._isNoun ? "Noun" : "Verb";
-      const prefix = c._isNoun ? (ARTICLES[c.gender] || "") + " " : "";
+      const badgeCls = c._type === "noun" ? "noun-badge" : c._type === "adjective" ? "adj-badge" : "verb-badge";
+      const typeLabel = c._type === "noun" ? "Noun" : c._type === "adjective" ? "Adj" : "Verb";
+      const prefix = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
       return `<div class="picker-item${sel ? " selected" : ""}" data-id="${c.id}">
       <span class="badge ${badgeCls}">${typeLabel}</span>
       <span class="picker-name">${escapeHtml(prefix + c.name)}</span>
@@ -1016,6 +1097,14 @@ function searchCards(query) {
     if (m(n.meaning.ind)) add(n, "noun", "Indonesian", n.meaning.ind);
   });
 
+  data.adjectives.forEach((a) => {
+    if (m(a.name)) add(a, "adjective", null, a.name);
+    if (m(a.comparative || "")) add(a, "adjective", "Komparativ", a.comparative);
+    if (m(a.superlative || "")) add(a, "adjective", "Superlativ", a.superlative);
+    if (m(a.meaning.eng)) add(a, "adjective", "English", a.meaning.eng);
+    if (m(a.meaning.ind)) add(a, "adjective", "Indonesian", a.meaning.ind);
+  });
+
   return results.slice(0, 8);
 }
 
@@ -1033,8 +1122,8 @@ function renderSearchDropdown(results, query) {
   }
   dd.innerHTML = results
     .map((r) => {
-      const badgeClass = r.type === "verb" ? "verb-badge" : "noun-badge";
-      const badgeLabel = r.type === "verb" ? "Verb" : "Noun";
+      const badgeClass = r.type === "verb" ? "verb-badge" : r.type === "adjective" ? "adj-badge" : "noun-badge";
+      const badgeLabel = r.type === "verb" ? "Verb" : r.type === "adjective" ? "Adj" : "Noun";
       const matchHtml = r.matchLabel
         ? `<span class="search-result-match">${escapeHtml(r.matchLabel)} · ${highlightMatch(r.matchValue, query)}</span>`
         : "";
@@ -1055,7 +1144,8 @@ function renderSearchDropdown(results, query) {
 }
 
 function navigateToCard(cardId, cardType) {
-  const targetDeck = cardType === "verb" ? "verbs" : "nouns";
+  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives" };
+  const targetDeck = typeToKey[cardType] || "nouns";
   if (state.deck !== targetDeck) switchDeck(targetDeck);
   const idx = state.cards.findIndex((c) => c.id === cardId);
   if (idx !== -1) {
@@ -1088,7 +1178,7 @@ function init() {
 
   // Add card
   $("btn-add").addEventListener("click", () => {
-    const type = state.deck === "verbs" ? "verb" : "noun";
+    const type = state.deck === "verbs" ? "verb" : state.deck === "adjectives" ? "adjective" : "noun";
     openModal(type);
   });
 
@@ -1156,7 +1246,7 @@ function init() {
   // Edit / Delete
   $("btn-edit-card").addEventListener("click", () => {
     const card = state.cards[state.index];
-    openModal(isNounCard(card) ? "noun" : "verb", card);
+    openModal(isNounCard(card) ? "noun" : isAdjectiveCard(card) ? "adjective" : "verb", card);
   });
   $("btn-delete-card").addEventListener("click", () => showDeleteConfirm(true));
   $("btn-confirm-delete").addEventListener("click", deleteCard);
