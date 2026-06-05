@@ -22,14 +22,6 @@
         <!-- Back button (group mode) -->
         <button class="hidden" id="btn-back-groups" title="Back to Groups">‹</button>
 
-        <!-- Sliding pill toggle -->
-        <div class="deck-toggle" id="deck-toggle">
-          <button class="toggle-opt active" data-deck="nouns">Noun</button>
-          <button class="toggle-opt" data-deck="verbs">Verb</button>
-          <button class="toggle-opt" data-deck="adjectives">Adj</button>
-          <div class="toggle-slider"></div>
-        </div>
-
         <!-- Search -->
         <div class="search-wrap" id="search-wrap">
           <input type="text" id="search-input" placeholder="Search anything…" autocomplete="off" spellcheck="false">
@@ -41,6 +33,13 @@
 
         <!-- Right side controls -->
         <div class="header-right">
+          <!-- Sliding pill toggle -->
+          <div class="deck-toggle" id="deck-toggle">
+            <button class="toggle-opt active" data-deck="nouns">Noun</button>
+            <button class="toggle-opt" data-deck="verbs">Verb</button>
+            <button class="toggle-opt" data-deck="adjectives">Adj</button>
+            <div class="toggle-slider"></div>
+          </div>
           <span id="card-counter"></span>
           <label class="shuffle-label" title="Shuffle">
             <input type="checkbox" id="shuffle-toggle"> Shuffle
