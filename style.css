@@ -124,6 +124,11 @@ body {
   transform: translateX(200%);
 }
 
+/* Slide pill to Adverb position */
+.deck-toggle.adv-active .toggle-slider {
+  transform: translateX(300%);
+}
+
 /* ── Header Right ─────────────────────────────────────────────── */
 
 .header-right {
@@ -270,6 +275,7 @@ body {
 .noun-badge  { background: #e8f0fe; color: #1a3c9e; }
 .verb-badge  { background: #fce8e6; color: #9e1a1a; }
 .adj-badge   { background: #e6f4ea; color: #1a6b3c; }
+.adv-badge   { background: #f3e8ff; color: #6b1a9e; }
 .reg-badge   { background: #e6f4ea; color: #1a7a3c; }
 .irreg-badge { background: #fff3e0; color: #b85c00; }
 .gender-m { background: #e8f0fe; color: #1a3c9e; }

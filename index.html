@@ -38,6 +38,7 @@
             <button class="toggle-opt active" data-deck="nouns">Noun</button>
             <button class="toggle-opt" data-deck="verbs">Verb</button>
             <button class="toggle-opt" data-deck="adjectives">Adj</button>
+            <button class="toggle-opt" data-deck="adverbs">Adv</button>
             <div class="toggle-slider"></div>
           </div>
           <span id="card-counter"></span>
@@ -138,6 +139,7 @@
         <button class="type-btn active" data-type="verb">Verb</button>
         <button class="type-btn" data-type="noun">Noun</button>
         <button class="type-btn" data-type="adjective">Adjective</button>
+        <button class="type-btn" data-type="adverb">Adverb</button>
       </div>
 
       <!-- Verb Form -->
@@ -197,6 +199,31 @@
         <div class="form-group">
           <label>Meaning (Indonesian)</label>
           <input type="text" id="noun-ind" placeholder="anjing">
+        </div>
+      </div>
+
+      <!-- Adverb Form -->
+      <div id="adverb-form" class="hidden">
+        <div class="form-group">
+          <label>Adverb</label>
+          <input type="text" id="adv-name" placeholder="e.g. schnell">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="adv-type">
+            <option value="modal">Modal (how)</option>
+            <option value="temporal">Temporal (when)</option>
+            <option value="lokal">Lokal (where)</option>
+            <option value="kausal">Kausal (why)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Meaning (English)</label>
+          <input type="text" id="adv-eng" placeholder="quickly">
+        </div>
+        <div class="form-group">
+          <label>Meaning (Indonesian)</label>
+          <input type="text" id="adv-ind" placeholder="dengan cepat">
         </div>
       </div>
 

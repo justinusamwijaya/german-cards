@@ -202,6 +202,7 @@ const SEED = {
     },
   ],
   adjectives: [],
+  adverbs: [],
   groups: [],
 };
 
@@ -215,6 +216,7 @@ function loadData() {
   const data = JSON.parse(raw);
   if (!data.groups) data.groups = [];
   if (!data.adjectives) data.adjectives = [];
+  if (!data.adverbs) data.adverbs = [];
   return data;
 }
 
@@ -296,6 +298,10 @@ function isAdjectiveCard(card) {
   return card.comparative !== undefined;
 }
 
+function isAdverbCard(card) {
+  return card.adverbType !== undefined;
+}
+
 // ── View Navigation ───────────────────────────────────────────────────────────
 
 function showView(id) {
@@ -349,6 +355,7 @@ function switchDeck(deckName) {
     .forEach((opt) => opt.classList.remove("active"));
   toggle.classList.remove("verb-active");
   toggle.classList.remove("adj-active");
+  toggle.classList.remove("adv-active");
 
   if (deckName === "nouns") {
     document.querySelector('[data-deck="nouns"]').classList.add("active");
@@ -358,6 +365,9 @@ function switchDeck(deckName) {
   } else if (deckName === "adjectives") {
     document.querySelector('[data-deck="adjectives"]').classList.add("active");
     toggle.classList.add("adj-active");
+  } else if (deckName === "adverbs") {
+    document.querySelector('[data-deck="adverbs"]').classList.add("active");
+    toggle.classList.add("adv-active");
   }
 
   $("btn-combine").classList.toggle("active", deckName === "combined");
@@ -370,21 +380,23 @@ function startDeck(deckName) {
   if (state.viewMode === "group-study") {
     const group = data.groups.find((g) => g.id === state.activeGroupId);
     const ids = new Set(group ? group.cardIds : []);
-    const groupCards = [...data.verbs, ...data.nouns, ...data.adjectives].filter((c) =>
+    const groupCards = [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs].filter((c) =>
       ids.has(c.id),
     );
     if (deckName === "combined") {
       state.cards = groupCards;
     } else if (deckName === "verbs") {
-      state.cards = groupCards.filter((c) => !isNounCard(c) && !isAdjectiveCard(c));
+      state.cards = groupCards.filter((c) => !isNounCard(c) && !isAdjectiveCard(c) && !isAdverbCard(c));
     } else if (deckName === "adjectives") {
       state.cards = groupCards.filter(isAdjectiveCard);
+    } else if (deckName === "adverbs") {
+      state.cards = groupCards.filter(isAdverbCard);
     } else {
       state.cards = groupCards.filter(isNounCard);
     }
   } else {
     if (deckName === "combined") {
-      state.cards = [...data.verbs, ...data.nouns, ...data.adjectives];
+      state.cards = [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs];
     } else {
       state.cards = [...data[deckName]];
     }
@@ -436,6 +448,8 @@ function renderCard() {
     renderNounCard(card);
   } else if (isAdjectiveCard(card)) {
     renderAdjectiveCard(card);
+  } else if (isAdverbCard(card)) {
+    renderAdverbCard(card);
   } else {
     renderVerbCard(card);
   }
@@ -548,6 +562,36 @@ function renderAdjectiveCard(adj) {
     </div>`;
 }
 
+function renderAdverbCard(adv) {
+  const typeLabel = { modal: "Modal", temporal: "Temporal", lokal: "Lokal", kausal: "Kausal" }[adv.adverbType] || adv.adverbType;
+
+  $("card-front").className = "card-front";
+  $("card-front").innerHTML = `
+    <div class="card-front-inner">
+      <span class="badge adv-badge">Adverb</span>
+      <div class="card-word">${adv.name}</div>
+      <div class="card-hint">hold to reveal</div>
+    </div>`;
+
+  $("card-back").innerHTML = `
+    <div class="back-content">
+      <div class="back-header">
+        <span class="badge adv-badge">Adverb</span>
+        <span class="back-word">${adv.name}</span>
+      </div>
+      <div class="back-row">
+        <span class="row-label">Type</span>
+        <span>${typeLabel}</span>
+      </div>
+      <div class="back-row">
+        <span class="flag">🇬🇧</span><span>${adv.meaning.eng}</span>
+      </div>
+      <div class="back-row">
+        <span class="flag">🇮🇩</span><span>${adv.meaning.ind}</span>
+      </div>
+    </div>`;
+}
+
 function showSummary() {
   $("study-content").classList.add("hidden");
   $("summary-wrap").classList.remove("hidden");
@@ -615,6 +659,11 @@ function openModal(type, card = null) {
       $("adj-superlative").value = card.superlative || "";
       $("adj-eng").value = card.meaning.eng;
       $("adj-ind").value = card.meaning.ind;
+    } else if (type === "adverb") {
+      $("adv-name").value = card.name;
+      $("adv-type").value = card.adverbType || "modal";
+      $("adv-eng").value = card.meaning.eng;
+      $("adv-ind").value = card.meaning.ind;
     } else {
       $("noun-name").value = card.name;
       $("noun-plural").value = card.plural;
@@ -625,7 +674,7 @@ function openModal(type, card = null) {
   }
 
   $("modal-overlay").classList.remove("hidden");
-  (type === "verb" ? $("verb-name") : type === "adjective" ? $("adj-name") : $("noun-name")).focus();
+  (type === "verb" ? $("verb-name") : type === "adjective" ? $("adj-name") : type === "adverb" ? $("adv-name") : $("noun-name")).focus();
 }
 
 function closeModal() {
@@ -645,8 +694,12 @@ function clearModal() {
   ["adj-name", "adj-comparative", "adj-superlative", "adj-eng", "adj-ind"].forEach((id) => {
     $(id).value = "";
   });
+  ["adv-name", "adv-eng", "adv-ind"].forEach((id) => {
+    $(id).value = "";
+  });
   $("verb-type").value = "regular";
   $("noun-gender").value = "maskulin";
+  $("adv-type").value = "modal";
 }
 
 function switchModalType(type) {
@@ -654,6 +707,7 @@ function switchModalType(type) {
   $("verb-form").classList.toggle("hidden", type !== "verb");
   $("noun-form").classList.toggle("hidden", type !== "noun");
   $("adjective-form").classList.toggle("hidden", type !== "adjective");
+  $("adverb-form").classList.toggle("hidden", type !== "adverb");
   document.querySelectorAll(".type-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
@@ -716,6 +770,29 @@ function saveCard() {
     } else {
       data.adjectives.push(entry);
     }
+  } else if (state.modalType === "adverb") {
+    const name = $("adv-name").value.trim();
+    if (!name) {
+      $("adv-name").focus();
+      return;
+    }
+
+    entry = {
+      id: state.editingId || genId(),
+      name,
+      adverbType: $("adv-type").value,
+      meaning: {
+        eng: $("adv-eng").value.trim(),
+        ind: $("adv-ind").value.trim(),
+      },
+    };
+
+    if (state.editingId) {
+      const idx = data.adverbs.findIndex((a) => a.id === state.editingId);
+      if (idx !== -1) data.adverbs[idx] = entry;
+    } else {
+      data.adverbs.push(entry);
+    }
   } else {
     const name = $("noun-name").value.trim();
     if (!name) {
@@ -757,7 +834,7 @@ function saveCard() {
   closeModal();
 
   if (state.editingId && state.deck) {
-    const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives" };
+    const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
     const updated = loadData()[
       state.deck === "combined"
         ? typeToKey[state.modalType] || "nouns"
@@ -766,7 +843,7 @@ function saveCard() {
     if (updated) state.cards[state.index] = updated;
     renderCard();
   } else {
-    const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives" };
+    const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
     switchDeck(typeToKey[state.modalType] || "nouns");
   }
 }
@@ -778,7 +855,7 @@ function deleteCard() {
   }
   const card = state.cards[state.index];
   const data = loadData();
-  const listKey = isNounCard(card) ? "nouns" : isAdjectiveCard(card) ? "adjectives" : "verbs";
+  const listKey = isNounCard(card) ? "nouns" : isAdjectiveCard(card) ? "adjectives" : isAdverbCard(card) ? "adverbs" : "verbs";
   data[listKey] = data[listKey].filter((c) => c.id !== card.id);
   saveData(data);
   state.cards.splice(state.index, 1);
@@ -966,6 +1043,7 @@ function renderCardPicker(query) {
     ...data.verbs.map((c) => ({ ...c, _type: "verb" })),
     ...data.nouns.map((c) => ({ ...c, _type: "noun" })),
     ...data.adjectives.map((c) => ({ ...c, _type: "adjective" })),
+    ...data.adverbs.map((c) => ({ ...c, _type: "adverb" })),
   ].filter((c) => {
     if (!q) return true;
     const prefix = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
@@ -985,8 +1063,8 @@ function renderCardPicker(query) {
   list.innerHTML = allCards
     .map((c) => {
       const sel = _groupSelectedIds.has(c.id);
-      const badgeCls = c._type === "noun" ? "noun-badge" : c._type === "adjective" ? "adj-badge" : "verb-badge";
-      const typeLabel = c._type === "noun" ? "Noun" : c._type === "adjective" ? "Adj" : "Verb";
+      const badgeCls = c._type === "noun" ? "noun-badge" : c._type === "adjective" ? "adj-badge" : c._type === "adverb" ? "adv-badge" : "verb-badge";
+      const typeLabel = c._type === "noun" ? "Noun" : c._type === "adjective" ? "Adj" : c._type === "adverb" ? "Adv" : "Verb";
       const prefix = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
       return `<div class="picker-item${sel ? " selected" : ""}" data-id="${c.id}">
       <span class="badge ${badgeCls}">${typeLabel}</span>
@@ -1105,6 +1183,13 @@ function searchCards(query) {
     if (m(a.meaning.ind)) add(a, "adjective", "Indonesian", a.meaning.ind);
   });
 
+  data.adverbs.forEach((a) => {
+    if (m(a.name)) add(a, "adverb", null, a.name);
+    if (m(a.adverbType || "")) add(a, "adverb", "Type", a.adverbType);
+    if (m(a.meaning.eng)) add(a, "adverb", "English", a.meaning.eng);
+    if (m(a.meaning.ind)) add(a, "adverb", "Indonesian", a.meaning.ind);
+  });
+
   return results.slice(0, 8);
 }
 
@@ -1122,8 +1207,8 @@ function renderSearchDropdown(results, query) {
   }
   dd.innerHTML = results
     .map((r) => {
-      const badgeClass = r.type === "verb" ? "verb-badge" : r.type === "adjective" ? "adj-badge" : "noun-badge";
-      const badgeLabel = r.type === "verb" ? "Verb" : r.type === "adjective" ? "Adj" : "Noun";
+      const badgeClass = r.type === "verb" ? "verb-badge" : r.type === "adjective" ? "adj-badge" : r.type === "adverb" ? "adv-badge" : "noun-badge";
+      const badgeLabel = r.type === "verb" ? "Verb" : r.type === "adjective" ? "Adj" : r.type === "adverb" ? "Adv" : "Noun";
       const matchHtml = r.matchLabel
         ? `<span class="search-result-match">${escapeHtml(r.matchLabel)} · ${highlightMatch(r.matchValue, query)}</span>`
         : "";
@@ -1144,7 +1229,7 @@ function renderSearchDropdown(results, query) {
 }
 
 function navigateToCard(cardId, cardType) {
-  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives" };
+  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
   const targetDeck = typeToKey[cardType] || "nouns";
   if (state.deck !== targetDeck) switchDeck(targetDeck);
   const idx = state.cards.findIndex((c) => c.id === cardId);
@@ -1178,7 +1263,7 @@ function init() {
 
   // Add card
   $("btn-add").addEventListener("click", () => {
-    const type = state.deck === "verbs" ? "verb" : state.deck === "adjectives" ? "adjective" : "noun";
+    const type = state.deck === "verbs" ? "verb" : state.deck === "adjectives" ? "adjective" : state.deck === "adverbs" ? "adverb" : "noun";
     openModal(type);
   });
 
@@ -1246,7 +1331,7 @@ function init() {
   // Edit / Delete
   $("btn-edit-card").addEventListener("click", () => {
     const card = state.cards[state.index];
-    openModal(isNounCard(card) ? "noun" : isAdjectiveCard(card) ? "adjective" : "verb", card);
+    openModal(isNounCard(card) ? "noun" : isAdjectiveCard(card) ? "adjective" : isAdverbCard(card) ? "adverb" : "verb", card);
   });
   $("btn-delete-card").addEventListener("click", () => showDeleteConfirm(true));
   $("btn-confirm-delete").addEventListener("click", deleteCard);
