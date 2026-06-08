@@ -20,8 +20,10 @@ function renderGroupsList() {
       </div>
       <div class="group-btns" data-id="${escapeHtml(g.id)}">
         <button class="group-open-btn" data-id="${escapeHtml(g.id)}">Open</button>
+        ${isAuthed() ? `
         <button class="group-edit-btn" data-id="${escapeHtml(g.id)}" title="Edit group">✏️</button>
         <button class="group-del-btn"  data-id="${escapeHtml(g.id)}" title="Delete group">🗑️</button>
+        ` : ""}
       </div>
     </div>`;
   }).join("");
@@ -44,10 +46,12 @@ function promptDeleteGroup(groupId, triggerBtn) {
     <button class="group-confirm-yes" data-id="${escapeHtml(groupId)}">Yes</button>
     <button class="group-confirm-no">No</button>`;
   btns.querySelector(".group-confirm-yes").addEventListener("click", () => {
-    const data = loadData();
-    data.groups = data.groups.filter((g) => g.id !== groupId);
-    saveData(data);
-    renderGroupsList();
+    guardCUD(() => {
+      const data = loadData();
+      data.groups = data.groups.filter((g) => g.id !== groupId);
+      saveData(data);
+      renderGroupsList();
+    });
   });
   btns.querySelector(".group-confirm-no").addEventListener("click", renderGroupsList);
 }

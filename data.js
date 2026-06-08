@@ -1,9 +1,10 @@
 // ── Storage & Sync Config ─────────────────────────────────────────────────────
 
-const STORAGE_KEY = "germancards";
-const GIST_ID     = "f9f86c5e14e3c389ff922777d733b174";
-const GIST_TOKEN  = "__GIST_TOKEN__";
-const GIST_FILE   = "vocab.txt";
+const STORAGE_KEY  = "germancards";
+const GIST_ID      = "f9f86c5e14e3c389ff922777d733b174";
+const GIST_TOKEN   = "__GIST_TOKEN__";
+const GIST_FILE    = "vocab.txt";
+const GIST_AUTH_KEY = "AsYx_O!!2";
 
 // ── Shared Constants ──────────────────────────────────────────────────────────
 
@@ -87,6 +88,7 @@ function loadData() {
     return seed;
   }
   const data = JSON.parse(raw);
+  delete data[GIST_AUTH_KEY];
   if (!data.groups)     data.groups     = [];
   if (!data.adjectives) data.adjectives = [];
   if (!data.adverbs)    data.adverbs    = [];
@@ -94,8 +96,15 @@ function loadData() {
 }
 
 function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  if (GIST_ID && GIST_TOKEN) {
+  // Preserve the auth key so it survives round-trips through localStorage
+  let toStore = data;
+  const existingRaw = localStorage.getItem(STORAGE_KEY);
+  if (existingRaw) {
+    const existing = JSON.parse(existingRaw);
+    if (existing[GIST_AUTH_KEY]) toStore = { ...data, [GIST_AUTH_KEY]: existing[GIST_AUTH_KEY] };
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+  if (GIST_ID && GIST_TOKEN && GIST_TOKEN !== "__GIST_TOKEN__") {
     fetch(`https://api.github.com/gists/${GIST_ID}`, {
       method: "PATCH",
       headers: {
@@ -103,14 +112,14 @@ function saveData(data) {
         Authorization: `token ${GIST_TOKEN}`,
       },
       body: JSON.stringify({
-        files: { [GIST_FILE]: { content: JSON.stringify(data, null, 2) } },
+        files: { [GIST_FILE]: { content: JSON.stringify(toStore, null, 2) } },
       }),
     }).catch(() => {});
   } else {
     fetch("/vocab.txt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data, null, 2),
+      body: JSON.stringify(toStore, null, 2),
     }).catch(() => {});
   }
 }

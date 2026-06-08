@@ -9,8 +9,24 @@
 </head>
 <body>
 
+  <!-- ── Login Screen ─────────────────────────────────────── -->
+  <div id="view-login" class="view active">
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="login-logo">DE</div>
+        <h1 class="login-title">German Cards</h1>
+        <form id="login-form" class="login-form">
+          <input type="text"     id="login-user" placeholder="Username" autocomplete="username" spellcheck="false">
+          <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
+          <p id="login-error" class="login-error hidden">Incorrect credentials</p>
+          <button type="submit" id="btn-login">Sign in</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Single Study Screen ───────────────────────────────── -->
-  <div id="view-study" class="view active">
+  <div id="view-study" class="view">
 
     <header>
       <!-- Group title strip (navy, shown only in group study mode) -->
@@ -51,10 +67,11 @@
           </div>
           <button class="header-btn primary" id="btn-add" title="Add card">+</button>
           <button class="header-btn" id="btn-export" title="Export to vocab.txt">↓</button>
-          <label class="header-btn-label" for="input-import" title="Import vocab.txt">↑</label>
+          <label class="header-btn-label" id="import-label" for="input-import" title="Import vocab.txt">↑</label>
           <input type="file" id="input-import" accept=".txt,.json">
           <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
           <a class="header-btn" href="vocabgendertraining/index.html" title="Gender Training" style="text-decoration:none;display:inline-flex;align-items:center;">Gender</a>
+          <button class="header-btn hidden" id="btn-logout">Logout</button>
         </div>
       </div>
     </header>
@@ -293,6 +310,7 @@
   <script src="search.js"></script>
   <script src="groups.js"></script>
   <script src="modal.js"></script>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

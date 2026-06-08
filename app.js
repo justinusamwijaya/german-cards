@@ -241,8 +241,9 @@ function init() {
   // Export / Import
   $("btn-export").addEventListener("click", exportData);
   $("input-import").addEventListener("change", (e) => {
-    if (e.target.files[0]) importData(e.target.files[0]);
+    const file = e.target.files[0];
     e.target.value = "";
+    if (file) guardCUD(() => importData(file));
   });
 
   // Groups navigation
@@ -289,7 +290,7 @@ function init() {
     openModal(isNounCard(card) ? "noun" : isAdjectiveCard(card) ? "adjective" : isAdverbCard(card) ? "adverb" : "verb", card);
   });
   $("btn-delete-card").addEventListener("click",  () => showDeleteConfirm(true));
-  $("btn-confirm-delete").addEventListener("click", deleteCard);
+  $("btn-confirm-delete").addEventListener("click", () => guardCUD(deleteCard));
   $("btn-cancel-delete").addEventListener("click",  () => showDeleteConfirm(false));
 
   // Summary
@@ -342,14 +343,14 @@ function init() {
   document.querySelectorAll(".type-btn").forEach((btn) => {
     btn.addEventListener("click", () => { if (!btn.disabled) switchModalType(btn.dataset.type); });
   });
-  $("btn-modal-save").addEventListener("click",   saveCard);
+  $("btn-modal-save").addEventListener("click",   () => guardCUD(saveCard));
   $("btn-modal-cancel").addEventListener("click", closeModal);
   $("modal-overlay").addEventListener("click", (e) => {
     if (e.target === $("modal-overlay")) closeModal();
   });
 
   // Group modal
-  $("btn-group-save").addEventListener("click",   saveGroup);
+  $("btn-group-save").addEventListener("click",   () => guardCUD(saveGroup));
   $("btn-group-cancel").addEventListener("click", closeGroupModal);
   $("modal-group-overlay").addEventListener("click", (e) => {
     if (e.target === $("modal-group-overlay")) closeGroupModal();
@@ -407,10 +408,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     let data;
     if (GIST_ID) {
-      const res = await fetch(
-        `https://api.github.com/gists/${GIST_ID}`,
-        GIST_TOKEN ? { headers: { Authorization: `token ${GIST_TOKEN}` } } : {},
-      );
+      const res = await fetch(`https://api.github.com/gists/${GIST_ID}`);
       if (res.ok) {
         const gist = await res.json();
         data = JSON.parse(gist.files[GIST_FILE].content);
@@ -424,5 +422,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
   } catch {}
+
+  // ── Login form ────────────────────────────────────────────────
+  $("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("btn-login");
+    btn.disabled    = true;
+    btn.textContent = "Checking…";
+    hide("login-error");
+
+    const ok = await attemptLogin(
+      $("login-user").value.trim(),
+      $("login-pass").value.trim(),
+    );
+
+    if (ok) {
+      applyAuthUI();
+      showView("view-study");
+    } else {
+      show("login-error");
+    }
+    btn.disabled    = false;
+    btn.textContent = "Sign in";
+  });
+
+  $("btn-logout").addEventListener("click", doLogout);
+
   init();
+
+  if (isAuthed()) {
+    showView("view-study");
+  }
+  applyAuthUI();
 });
