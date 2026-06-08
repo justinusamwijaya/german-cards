@@ -27,38 +27,39 @@ async function fetchRemoteToken() {
   }
 }
 
-async function attemptLogin(username, password) {
-  if (username !== "admin" || password !== "admindeutsch") return false;
-  const token = await fetchRemoteToken();
-  if (!token) return false;
-  localStorage.setItem(TOKEN_KEY, token);
-  return true;
-}
-
-// Verifies stored token matches Gist before executing a CUD operation.
-// Calls fn() if valid; forces logout if not.
 async function guardCUD(fn) {
-  if (!isAuthed()) { doLogout(); return; }
-  const stored  = localStorage.getItem(TOKEN_KEY);
-  const current = await fetchRemoteToken();
-  if (!current || current !== stored) { doLogout(); return; }
+  // Already have a token — verify it still matches remote
+  if (isAuthed()) {
+    const stored  = localStorage.getItem(TOKEN_KEY);
+    const current = await fetchRemoteToken();
+    if (current && current === stored) { fn(); return; }
+    // Token changed or unreachable — clear and bail; user can retry
+    localStorage.removeItem(TOKEN_KEY);
+    applyAuthUI();
+    return;
+  }
+
+  // No token — prompt for credentials
+  const username = window.prompt("User:");
+  if (username === null || username.trim() !== "admin") return;
+
+  const password = window.prompt("Password:");
+  if (password === null) return;
+  if (password !== "admindeutsch") { window.alert("Incorrect password."); return; }
+
+  const token = await fetchRemoteToken();
+  if (!token) { window.alert("Could not reach server."); return; }
+
+  localStorage.setItem(TOKEN_KEY, token);
+  applyAuthUI();
   fn();
 }
 
 function doLogout() {
   localStorage.removeItem(TOKEN_KEY);
   applyAuthUI();
-  showView("view-login");
-  $("login-user").value = "";
-  $("login-pass").value = "";
-  hide("login-error");
 }
 
 function applyAuthUI() {
-  const authed = isAuthed();
-  setVisible("btn-add",       authed);
-  setVisible("import-label",  authed);
-  setVisible("card-actions",  authed);
-  setVisible("btn-new-group", authed);
-  setVisible("btn-logout",    authed);
+  setVisible("btn-logout", isAuthed());
 }

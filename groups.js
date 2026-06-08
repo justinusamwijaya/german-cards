@@ -20,10 +20,8 @@ function renderGroupsList() {
       </div>
       <div class="group-btns" data-id="${escapeHtml(g.id)}">
         <button class="group-open-btn" data-id="${escapeHtml(g.id)}">Open</button>
-        ${isAuthed() ? `
         <button class="group-edit-btn" data-id="${escapeHtml(g.id)}" title="Edit group">✏️</button>
         <button class="group-del-btn"  data-id="${escapeHtml(g.id)}" title="Delete group">🗑️</button>
-        ` : ""}
       </div>
     </div>`;
   }).join("");

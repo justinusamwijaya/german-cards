@@ -9,24 +9,8 @@
 </head>
 <body>
 
-  <!-- ── Login Screen ─────────────────────────────────────── -->
-  <div id="view-login" class="view active">
-    <div class="login-wrap">
-      <div class="login-card">
-        <div class="login-logo">DE</div>
-        <h1 class="login-title">German Cards</h1>
-        <form id="login-form" class="login-form">
-          <input type="text"     id="login-user" placeholder="Username" autocomplete="username" spellcheck="false">
-          <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
-          <p id="login-error" class="login-error hidden">Incorrect credentials</p>
-          <button type="submit" id="btn-login">Sign in</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- ── Single Study Screen ───────────────────────────────── -->
-  <div id="view-study" class="view">
+  <div id="view-study" class="view active">
 
     <header>
       <!-- Group title strip (navy, shown only in group study mode) -->
@@ -71,7 +55,6 @@
           <input type="file" id="input-import" accept=".txt,.json">
           <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
           <a class="header-btn" href="vocabgendertraining/index.html" title="Gender Training" style="text-decoration:none;display:inline-flex;align-items:center;">Gender</a>
-          <button class="header-btn hidden" id="btn-logout">Logout</button>
         </div>
       </div>
     </header>
@@ -303,6 +286,9 @@
       </div>
     </div>
   </div>
+
+  <!-- ── Logout (fixed, bottom-right, admin only) ─────────── -->
+  <button id="btn-logout" class="logout-fab hidden">Logout</button>
 
   <script src="domhandler.js"></script>
   <script src="data.js"></script>

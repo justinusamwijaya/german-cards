@@ -423,35 +423,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   } catch {}
 
-  // ── Login form ────────────────────────────────────────────────
-  $("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = $("btn-login");
-    btn.disabled    = true;
-    btn.textContent = "Checking…";
-    hide("login-error");
-
-    const ok = await attemptLogin(
-      $("login-user").value.trim(),
-      $("login-pass").value.trim(),
-    );
-
-    if (ok) {
-      applyAuthUI();
-      showView("view-study");
-    } else {
-      show("login-error");
-    }
-    btn.disabled    = false;
-    btn.textContent = "Sign in";
-  });
-
   $("btn-logout").addEventListener("click", doLogout);
 
   init();
-
-  if (isAuthed()) {
-    showView("view-study");
-  }
   applyAuthUI();
 });
