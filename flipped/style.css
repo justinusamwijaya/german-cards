@@ -25,14 +25,16 @@ header {
 .deck-select:hover,
 .deck-select:focus { border-color: #1a3c5e; }
 
-/* ── Training area ───────────────────────────────────────────────── */
+/* ── Training area: fill available height ────────────────────────── */
 
 #training-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .75rem;
+  gap: .6rem;
   width: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 /* ── Score bar ───────────────────────────────────────────────────── */
@@ -43,6 +45,7 @@ header {
   font-size: .82rem;
   font-weight: 700;
   color: #999;
+  flex-shrink: 0;
 }
 .score-bar .s-knew   { color: #16a34a; }
 .score-bar .s-didnt  { color: #dc2626; }
@@ -53,7 +56,49 @@ header {
 .card-counter {
   text-align: center;
   font-size: .85rem;
-  color: #888;
+  color: #bbb;
+  flex-shrink: 0;
+  letter-spacing: .03em;
+}
+
+/* ── Meaning rows on card front ──────────────────────────────────── */
+
+.meaning-rows {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  width: 100%;
+  margin: .25rem 0;
+}
+
+.meaning-row {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .55rem .8rem;
+  background: #f5f3ef;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.meaning-row .flag { font-size: 1.1rem; flex-shrink: 0; }
+
+/* ── Back: German word big and prominent ─────────────────────────── */
+
+.back-word {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.back-header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .35rem;
+  margin-bottom: 1rem;
 }
 
 /* ── Empty state ─────────────────────────────────────────────────── */
@@ -68,5 +113,7 @@ header {
 /* ── Mobile ──────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  .deck-select { max-width: 110px; font-size: .78rem; }
+  .deck-select  { max-width: 110px; font-size: .78rem; }
+  .meaning-row  { font-size: 1.05rem; }
+  .back-word    { font-size: 1.6rem; }
 }

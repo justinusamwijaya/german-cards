@@ -117,8 +117,10 @@ function renderNounCard(noun) {
   setCardContent(
     `<div class="card-front-inner">
       <span class="badge noun-badge">Nomen</span>
-      <div class="back-row"><span class="flag">🇬🇧</span><span>${escHtml(noun.meaning.eng)}</span></div>
-      <div class="back-row"><span class="flag">🇮🇩</span><span>${escHtml(noun.meaning.ind)}</span></div>
+      <div class="meaning-rows">
+        <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(noun.meaning.eng)}</span></div>
+        <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(noun.meaning.ind)}</span></div>
+      </div>
       <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
@@ -143,8 +145,10 @@ function renderVerbCard(verb) {
         <span class="badge verb-badge">Verb</span>
         <span class="badge ${typeClass}">${verb.type === "irregular" ? "Irregular" : "Regular"}</span>
       </div>
-      <div class="back-row"><span class="flag">🇬🇧</span><span>${escHtml(verb.meaning.eng)}</span></div>
-      <div class="back-row"><span class="flag">🇮🇩</span><span>${escHtml(verb.meaning.ind)}</span></div>
+      <div class="meaning-rows">
+        <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(verb.meaning.eng)}</span></div>
+        <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(verb.meaning.ind)}</span></div>
+      </div>
       <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
@@ -161,8 +165,10 @@ function renderAdjectiveCard(adj) {
   setCardContent(
     `<div class="card-front-inner">
       <span class="badge adj-badge">Adjektiv</span>
-      <div class="back-row"><span class="flag">🇬🇧</span><span>${escHtml(adj.meaning.eng)}</span></div>
-      <div class="back-row"><span class="flag">🇮🇩</span><span>${escHtml(adj.meaning.ind)}</span></div>
+      <div class="meaning-rows">
+        <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(adj.meaning.eng)}</span></div>
+        <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(adj.meaning.ind)}</span></div>
+      </div>
       <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
@@ -182,8 +188,10 @@ function renderAdverbCard(adv) {
   setCardContent(
     `<div class="card-front-inner">
       <span class="badge adv-badge">Adverb</span>
-      <div class="back-row"><span class="flag">🇬🇧</span><span>${escHtml(adv.meaning.eng)}</span></div>
-      <div class="back-row"><span class="flag">🇮🇩</span><span>${escHtml(adv.meaning.ind)}</span></div>
+      <div class="meaning-rows">
+        <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(adv.meaning.eng)}</span></div>
+        <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(adv.meaning.ind)}</span></div>
+      </div>
       <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
