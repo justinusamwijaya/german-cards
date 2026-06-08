@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flipped Training</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="view active">
+
+    <header>
+      <div class="header-nav">
+        <a href="../index.html" class="header-btn" style="text-decoration:none;font-size:1.3rem;padding:.2rem .55rem;line-height:1;">‹</a>
+        <span style="font-weight:800;color:#1a3c5e;font-size:1rem;flex:1;">Flipped Training</span>
+        <select class="deck-select" id="deck-select">
+          <option value="nouns">Nouns</option>
+          <option value="verbs">Verbs</option>
+          <option value="adjectives">Adjectives</option>
+          <option value="adverbs">Adverbs</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="study-main">
+
+      <div id="training-area">
+
+        <div class="score-bar">
+          <span>✓ <span class="s-knew" id="score-knew">0</span></span>
+          <span>✗ <span class="s-didnt" id="score-didnt">0</span></span>
+          <span>Left: <span class="s-remain" id="score-remain">0</span></span>
+        </div>
+
+        <div class="card-scene">
+          <div class="card-inner" id="card-inner">
+            <div class="card-front" id="card-front"></div>
+            <div class="card-back"  id="card-back"></div>
+          </div>
+        </div>
+
+        <div class="card-counter" id="card-counter"></div>
+
+        <div class="study-nav">
+          <button id="btn-prev">← Prev</button>
+          <div class="knew-buttons">
+            <button id="btn-knew">✓ Knew it</button>
+            <button id="btn-didnt">✗ Didn't</button>
+          </div>
+          <button id="btn-next">Next →</button>
+        </div>
+
+      </div>
+
+      <p class="empty-msg" id="empty-msg" style="display:none">No cards in this deck.</p>
+
+      <div class="summary-wrap hidden" id="summary-wrap">
+        <div id="session-summary">
+          <h2>Session complete!</h2>
+          <p id="summary-text"></p>
+          <div class="summary-buttons">
+            <button id="btn-restart">Restart deck</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -246,6 +246,13 @@ function init() {
     if (file) guardCUD(() => importData(file));
   });
 
+  // Mode dropdown
+  $("mode-cycle-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    $("mode-dropdown").classList.toggle("hidden");
+  });
+  document.addEventListener("click", () => $("mode-dropdown").classList.add("hidden"));
+
   // Groups navigation
   $("btn-groups").addEventListener("click", goToGroups);
   $("btn-back-groups").addEventListener("click", goToGroups);

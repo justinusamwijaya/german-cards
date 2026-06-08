@@ -1,0 +1,72 @@
+/* ── Header ──────────────────────────────────────────────────────── */
+
+header {
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  flex-shrink: 0;
+}
+
+/* ── Deck selector ───────────────────────────────────────────────── */
+
+.deck-select {
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: .32rem .6rem;
+  font-size: .82rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: #555;
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .15s;
+  max-width: 130px;
+}
+.deck-select:hover,
+.deck-select:focus { border-color: #1a3c5e; }
+
+/* ── Training area ───────────────────────────────────────────────── */
+
+#training-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  width: 100%;
+}
+
+/* ── Score bar ───────────────────────────────────────────────────── */
+
+.score-bar {
+  display: flex;
+  gap: 1.5rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: #999;
+}
+.score-bar .s-knew   { color: #16a34a; }
+.score-bar .s-didnt  { color: #dc2626; }
+.score-bar .s-remain { color: #1a3c5e; }
+
+/* ── Card counter ────────────────────────────────────────────────── */
+
+.card-counter {
+  text-align: center;
+  font-size: .85rem;
+  color: #888;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+
+.empty-msg {
+  color: #aaa;
+  font-size: .95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .deck-select { max-width: 110px; font-size: .78rem; }
+}

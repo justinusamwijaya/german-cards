@@ -153,6 +153,44 @@ body {
   background: #e8f0fe;
 }
 
+/* ── Mode Dropdown ───────────────────────────────────────────── */
+
+.mode-switcher {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mode-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  overflow: hidden;
+  min-width: 120px;
+  z-index: 200;
+}
+
+.mode-drop-opt {
+  display: block;
+  width: 100%;
+  padding: .6rem 1.1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-weight: 600;
+  font-size: .9rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: #333;
+  text-decoration: none;
+  transition: background .1s;
+  box-sizing: border-box;
+}
+
+.mode-drop-opt:hover { background: #f0ece4; }
+
 /* ── Header Right ─────────────────────────────────────────────── */
 
 .header-right {

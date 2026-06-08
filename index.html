@@ -54,7 +54,13 @@
           <label class="header-btn-label" id="import-label" for="input-import" title="Import vocab.txt">↑</label>
           <input type="file" id="input-import" accept=".txt,.json">
           <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
-          <a class="header-btn" href="vocabgendertraining/index.html" title="Gender Training" style="text-decoration:none;display:inline-flex;align-items:center;">Gender</a>
+          <div class="mode-switcher" id="mode-switcher">
+            <button class="header-btn mode-cycle-btn" id="mode-cycle-btn">Mode</button>
+            <div class="mode-dropdown hidden" id="mode-dropdown">
+              <a class="mode-drop-opt" href="vocabgendertraining/index.html">Gender</a>
+              <a class="mode-drop-opt" href="flipped/index.html">Flipped</a>
+            </div>
+          </div>
         </div>
       </div>
     </header>
