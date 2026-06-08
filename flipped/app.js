@@ -1,15 +1,18 @@
-const ARTICLES  = { maskulin: 'der', feminin: 'die', netral: 'das' };
-const CONJ_KEYS = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'Sie'];
-const GIST_ID   = "f9f86c5e14e3c389ff922777d733b174";
-const GIST_TOKEN = "__GIST_TOKEN__";
-const GIST_FILE = "vocab.txt";
+const ARTICLES      = { maskulin: 'der', feminin: 'die', netral: 'das' };
+const CONJ_KEYS     = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'Sie'];
+const GIST_ID       = "f9f86c5e14e3c389ff922777d733b174";
+const GIST_TOKEN    = "__GIST_TOKEN__";
+const GIST_FILE     = "vocab.txt";
+const REVISION_KEY  = "flipped-revision-deck";
 
-let allData = {};
-let cards   = [];
-let index   = 0;
-let knew    = 0;
-let didnt   = 0;
-let answers = {};
+let allData      = {};
+let cards        = [];
+let index        = 0;
+let knew         = 0;
+let didnt        = 0;
+let answers      = {};
+let currentDeck  = "nouns";
+let currentGroup = "all";
 
 const $id = (id) => document.getElementById(id);
 
@@ -52,10 +55,25 @@ async function loadData() {
   }
 
   allData = data;
+
+  const groupSelect = $id("group-select");
+  (allData.groups || []).forEach(g => {
+    const opt = document.createElement("option");
+    opt.value = g.id;
+    opt.textContent = g.name;
+    groupSelect.appendChild(opt);
+  });
+
   startDeck($id("deck-select").value);
 }
 
 function getDeckCards(deckName) {
+  if (deckName === "combined") return [
+    ...(allData.nouns      || []),
+    ...(allData.verbs      || []),
+    ...(allData.adjectives || []),
+    ...(allData.adverbs    || []),
+  ];
   if (deckName === "nouns")      return allData.nouns      || [];
   if (deckName === "verbs")      return allData.verbs      || [];
   if (deckName === "adjectives") return allData.adjectives || [];
@@ -64,11 +82,30 @@ function getDeckCards(deckName) {
 }
 
 function startDeck(deckName) {
-  cards   = [...getDeckCards(deckName)];
+  currentDeck = deckName;
+
+  if (currentGroup !== "all") {
+    const group   = (allData.groups || []).find(g => g.id === currentGroup);
+    const ids     = new Set(group ? group.cardIds : []);
+    const all     = getDeckCards(deckName);
+    cards = all.filter(c => ids.has(c.id));
+  } else {
+    cards = [...getDeckCards(deckName)];
+  }
+
   index   = 0;
   knew    = 0;
   didnt   = 0;
   answers = {};
+
+  const revisionRaw = localStorage.getItem(REVISION_KEY);
+  if (revisionRaw) {
+    const revIds = new Set(JSON.parse(revisionRaw));
+    cards = cards.filter(c => revIds.has(c.id));
+  }
+
+  updateCombineBtn();
+  updateRevisionBanner();
 
   $id("summary-wrap").classList.add("hidden");
   $id("training-area").style.display = "";
@@ -80,6 +117,20 @@ function startDeck(deckName) {
   }
   $id("empty-msg").style.display = "none";
   renderCard();
+}
+
+function updateCombineBtn() {
+  $id("btn-combine").classList.toggle("active", currentDeck === "combined");
+}
+
+function updateRevisionBanner() {
+  const active = !!localStorage.getItem(REVISION_KEY);
+  $id("revision-banner").classList.toggle("hidden", !active);
+}
+
+function clearRevision() {
+  localStorage.removeItem(REVISION_KEY);
+  startDeck(currentDeck);
 }
 
 function renderCard() {
@@ -224,6 +275,10 @@ function showSummary() {
   $id("training-area").style.display = "none";
   $id("summary-wrap").classList.remove("hidden");
   $id("summary-text").textContent = `✓ Knew: ${knew}  ✗ Didn't: ${didnt}  · Total: ${cards.length}`;
+
+  const missed = cards.filter(c => answers[c.id] === "didnt");
+  $id("btn-retry-missed").classList.toggle("hidden", missed.length === 0);
+  $id("btn-refill-deck").classList.toggle("hidden",  !localStorage.getItem(REVISION_KEY));
 }
 
 // ── Flip interaction ──────────────────────────────────────────────────────────
@@ -257,7 +312,24 @@ $id("btn-didnt").addEventListener("click", () => {
   if (index < cards.length - 1) { index++; renderCard(); }
   else showSummary();
 });
-$id("btn-restart").addEventListener("click", () => startDeck($id("deck-select").value));
+
+$id("btn-restart").addEventListener("click", () => startDeck(currentDeck));
+
+$id("btn-retry-missed").addEventListener("click", () => {
+  const missedIds = cards.filter(c => answers[c.id] === "didnt").map(c => c.id);
+  localStorage.setItem(REVISION_KEY, JSON.stringify(missedIds));
+  startDeck(currentDeck);
+});
+
+$id("btn-refill-deck").addEventListener("click", clearRevision);
+$id("btn-clear-revision").addEventListener("click", clearRevision);
+
+$id("btn-combine").addEventListener("click", () => {
+  startDeck(currentDeck === "combined" ? "nouns" : "combined");
+  if (currentDeck !== "combined") $id("deck-select").value = "nouns";
+});
+
 $id("deck-select").addEventListener("change", (e) => startDeck(e.target.value));
+$id("group-select").addEventListener("change", (e) => { currentGroup = e.target.value; startDeck(currentDeck); });
 
 loadData();

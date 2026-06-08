@@ -22,6 +22,9 @@
           <option value="adjectives">Adjectives</option>
           <option value="adverbs">Adverbs</option>
         </select>
+        <select class="deck-select" id="group-select">
+          <option value="all">All Groups</option>
+        </select>
       </div>
     </header>
 
@@ -53,6 +56,13 @@
           <button id="btn-next">Next →</button>
         </div>
 
+        <button id="btn-combine">🔀 Combine Cards</button>
+
+        <div id="revision-banner" class="hidden">
+          Revision mode active &nbsp;·&nbsp;
+          <button id="btn-clear-revision">Refill all cards</button>
+        </div>
+
       </div>
 
       <p class="empty-msg" id="empty-msg" style="display:none">No cards in this deck.</p>
@@ -63,6 +73,8 @@
           <p id="summary-text"></p>
           <div class="summary-buttons">
             <button id="btn-restart">Restart deck</button>
+            <button id="btn-retry-missed" class="hidden">↺ Retry missed</button>
+            <button id="btn-refill-deck" class="hidden">Refill all cards</button>
           </div>
         </div>
       </div>
