@@ -687,7 +687,8 @@ body {
 /* ── Modal ────────────────────────────────────────────────────── */
 
 #modal-overlay,
-#modal-group-overlay {
+#modal-group-overlay,
+#modal-bulk-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.45);
@@ -1135,13 +1136,15 @@ body {
 
 @media (max-width: 600px) {
   #modal-overlay,
-  #modal-group-overlay {
+  #modal-group-overlay,
+  #modal-bulk-overlay {
     align-items: flex-end;
     padding: 0;
   }
 
   #modal-overlay .modal,
-  #modal-group-overlay .modal {
+  #modal-group-overlay .modal,
+  #modal-bulk-overlay .modal {
     width: 100%;
     border-radius: 20px 20px 0 0;
     padding: 1.5rem 1.25rem 1.25rem;
