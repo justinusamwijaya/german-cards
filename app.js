@@ -249,11 +249,6 @@ function init() {
 
   // Export / Import
   $("btn-export").addEventListener("click", exportData);
-  $("input-import").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    e.target.value = "";
-    if (file) guardCUD(() => importData(file));
-  });
 
   // Mode dropdown
   $("mode-cycle-btn").addEventListener("click", (e) => {
