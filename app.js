@@ -238,6 +238,15 @@ function init() {
     openModal(type);
   });
 
+  // Bulk add vocab via JSON paste
+  $("btn-bulk-add").addEventListener("click",  () => guardCUD(openBulkModal));
+  $("btn-bulk-save").addEventListener("click", () => guardCUD(saveBulkVocab));
+  $("btn-bulk-cancel").addEventListener("click", closeBulkModal);
+  $("modal-bulk-overlay").addEventListener("click", (e) => {
+    if (e.target === $("modal-bulk-overlay")) closeBulkModal();
+  });
+  $("bulk-vocab-type").addEventListener("change", updateBulkPlaceholder);
+
   // Export / Import
   $("btn-export").addEventListener("click", exportData);
   $("input-import").addEventListener("change", (e) => {
@@ -371,6 +380,7 @@ function init() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (!$("modal-group-overlay").classList.contains("hidden")) closeGroupModal();
+      else if (!$("modal-bulk-overlay").classList.contains("hidden")) closeBulkModal();
       else if (!$("modal-overlay").classList.contains("hidden")) closeModal();
       else closeSearch();
     }

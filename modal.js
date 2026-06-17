@@ -212,6 +212,126 @@ function exportData() {
   URL.revokeObjectURL(a.href);
 }
 
+// ── Bulk Add Vocab (JSON paste) ───────────────────────────────────────────────
+
+const BULK_PLACEHOLDERS = {
+  noun: `{
+  "name": "Hund",
+  "plural": "Hunde",
+  "gender": "maskulin",
+  "meaning": { "eng": "dog", "ind": "anjing" }
+}`,
+  verb: `{
+  "name": "gehen",
+  "type": "regular",
+  "conjugations": {
+    "ich": "gehe", "du": "gehst", "er/sie/es": "geht",
+    "wir": "gehen", "ihr": "geht", "Sie": "gehen"
+  },
+  "praeteritum": {
+    "ich": "ging", "du": "gingst", "er/sie/es": "ging",
+    "wir": "gingen", "ihr": "gingt", "Sie": "gingen"
+  },
+  "meaning": { "eng": "to go", "ind": "pergi" }
+}`,
+  adjective: `{
+  "name": "schnell",
+  "comparative": "schneller",
+  "superlative": "am schnellsten",
+  "meaning": { "eng": "fast", "ind": "cepat" }
+}`,
+  adverb: `{
+  "name": "da",
+  "adverbType": "lokal",
+  "meaning": { "eng": "there", "ind": "di sana" }
+}`,
+};
+
+function openBulkModal() {
+  $("bulk-vocab-type").value = "noun";
+  $("bulk-vocab-json").value = "";
+  $("bulk-vocab-error").textContent = "";
+  $("bulk-vocab-json").placeholder = BULK_PLACEHOLDERS.noun;
+  show("modal-bulk-overlay");
+  $("bulk-vocab-json").focus();
+}
+
+function closeBulkModal() {
+  hide("modal-bulk-overlay");
+}
+
+function updateBulkPlaceholder() {
+  $("bulk-vocab-json").placeholder = BULK_PLACEHOLDERS[$("bulk-vocab-type").value] || "";
+}
+
+function validateBulkEntry(type, entry) {
+  const m = entry.meaning;
+  if (!m || typeof m.eng !== "string" || typeof m.ind !== "string")
+    return 'Missing or invalid "meaning" — needs { "eng": "...", "ind": "..." }';
+
+  if (type === "noun") {
+    if (!entry.name)   return 'Missing "name"';
+    if (!entry.plural) return 'Missing "plural"';
+    if (!["maskulin", "feminin", "netral", "neutrum"].includes(entry.gender))
+      return '"gender" must be maskulin, feminin, netral, or neutrum';
+  } else if (type === "verb") {
+    if (!entry.name) return 'Missing "name"';
+    if (!["regular", "irregular"].includes(entry.type))
+      return '"type" must be regular or irregular';
+    for (const key of CONJ_KEYS) {
+      if (!entry.conjugations || typeof entry.conjugations[key] !== "string")
+        return `Missing conjugations["${key}"]`;
+      if (!entry.praeteritum || typeof entry.praeteritum[key] !== "string")
+        return `Missing praeteritum["${key}"]`;
+    }
+  } else if (type === "adjective") {
+    if (!entry.name) return 'Missing "name"';
+    if (typeof entry.comparative !== "string") return 'Missing "comparative" (use "" if none)';
+    if (typeof entry.superlative !== "string") return 'Missing "superlative" (use "" if none)';
+  } else if (type === "adverb") {
+    if (!entry.name)      return 'Missing "name"';
+    if (!entry.adverbType) return 'Missing "adverbType"';
+  }
+  return null;
+}
+
+function saveBulkVocab() {
+  const type    = $("bulk-vocab-type").value;
+  const raw     = $("bulk-vocab-json").value.trim();
+  const errorEl = $("bulk-vocab-error");
+  errorEl.textContent = "";
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    errorEl.textContent = "Invalid JSON: " + e.message;
+    return;
+  }
+
+  const entries = Array.isArray(parsed) ? parsed : [parsed];
+  for (let i = 0; i < entries.length; i++) {
+    const err = validateBulkEntry(type, entries[i]);
+    if (err) {
+      errorEl.textContent = entries.length > 1 ? `Entry ${i + 1}: ${err}` : err;
+      return;
+    }
+  }
+
+  const data = loadData();
+  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
+  const key = typeToKey[type];
+
+  for (const entry of entries) {
+    const { id: _ignored, ...rest } = entry;
+    data[key].push({ id: genId(), ...rest });
+  }
+
+  saveData(data);
+  closeBulkModal();
+  switchDeck(key);
+}
+
 function importData(file) {
   const reader = new FileReader();
   reader.onload = (e) => {

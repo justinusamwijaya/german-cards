@@ -50,6 +50,7 @@
             <button id="shuffle-off" class="shuffle-off hidden" title="Disable shuffle">✕</button>
           </div>
           <button class="header-btn primary" id="btn-add" title="Add card">+</button>
+          <button class="header-btn" id="btn-bulk-add" title="Bulk add vocab via JSON">{ }</button>
           <button class="header-btn" id="btn-export" title="Export to vocab.txt">↓</button>
           <label class="header-btn-label" id="import-label" for="input-import" title="Import vocab.txt">↑</label>
           <input type="file" id="input-import" accept=".txt,.json">
@@ -298,6 +299,31 @@
       <div class="modal-actions">
         <button id="btn-group-save">Save</button>
         <button id="btn-group-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bulk Add Vocab Modal ─────────────────────────────── -->
+  <div id="modal-bulk-overlay" class="hidden">
+    <div class="modal">
+      <h2>Add Vocab</h2>
+      <div class="form-group">
+        <label>Type of Vocab</label>
+        <select id="bulk-vocab-type">
+          <option value="noun">Noun</option>
+          <option value="verb">Verb</option>
+          <option value="adjective">Adjective</option>
+          <option value="adverb">Adverb</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Vocab JSON</label>
+        <textarea id="bulk-vocab-json" rows="12" spellcheck="false" style="width:100%;font-family:monospace;font-size:.82rem;padding:.5rem;border:1px solid #ccc;border-radius:6px;resize:vertical;background:#fafafa;"></textarea>
+      </div>
+      <div id="bulk-vocab-error" style="color:#e53935;font-size:.85rem;min-height:1.2em;margin-bottom:.5rem;"></div>
+      <div class="modal-actions">
+        <button id="btn-bulk-save">Add</button>
+        <button id="btn-bulk-cancel">Cancel</button>
       </div>
     </div>
   </div>
