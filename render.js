@@ -58,6 +58,13 @@ function renderVerbCard(verb) {
     (s) => `<tr><td class="subj">${s}</td><td>${verb.conjugations[s] || "—"}</td></tr>`
   ).join("");
 
+  const praeRows = verb.praeteritum
+    ? CONJ_KEYS.map((s) => `<tr><td class="subj">${s}</td><td>${verb.praeteritum[s] || "—"}</td></tr>`).join("")
+    : null;
+  const praeSection = praeRows
+    ? `<div class="prae-label">Präteritum</div><table class="conj-table">${praeRows}</table>`
+    : "";
+
   setCardContent(
     `<div class="card-front-inner">
       <div class="badge-row">
@@ -73,6 +80,7 @@ function renderVerbCard(verb) {
         <span class="back-word">${verb.name}</span>
       </div>
       <table class="conj-table">${conjRows}</table>
+      ${praeSection}
       <div class="back-row"><span class="flag">🇬🇧</span><span>${verb.meaning.eng}</span></div>
       <div class="back-row"><span class="flag">🇮🇩</span><span>${verb.meaning.ind}</span></div>
     </div>`

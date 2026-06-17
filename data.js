@@ -25,6 +25,15 @@ const CONJ_IDS = [
   "conj-sie",
 ];
 
+const PRAE_IDS = [
+  "prae-ich",
+  "prae-du",
+  "prae-er",
+  "prae-wir",
+  "prae-ihr",
+  "prae-sie",
+];
+
 // ── Seed Data ─────────────────────────────────────────────────────────────────
 
 const SEED = {
@@ -41,6 +50,14 @@ const SEED = {
         ihr: "buchstabiert",
         Sie: "buchstabieren",
       },
+      praeteritum: {
+        ich: "buchstabierte",
+        du: "buchstabiertest",
+        "er/sie/es": "buchstabierte",
+        wir: "buchstabierten",
+        ihr: "buchstabiertet",
+        Sie: "buchstabierten",
+      },
       meaning: { eng: "to spell", ind: "mengeja" },
     },
     {
@@ -54,6 +71,14 @@ const SEED = {
         wir: "heißen",
         ihr: "heißt",
         Sie: "heißen",
+      },
+      praeteritum: {
+        ich: "hieß",
+        du: "hießt",
+        "er/sie/es": "hieß",
+        wir: "hießen",
+        ihr: "hießt",
+        Sie: "hießen",
       },
       meaning: { eng: "to be called", ind: "bernama / dipanggil" },
     },
@@ -69,6 +94,14 @@ const SEED = {
         ihr: "kommt",
         Sie: "kommen",
       },
+      praeteritum: {
+        ich: "kam",
+        du: "kamst",
+        "er/sie/es": "kam",
+        wir: "kamen",
+        ihr: "kamt",
+        Sie: "kamen",
+      },
       meaning: { eng: "to come", ind: "datang" },
     },
     {
@@ -82,6 +115,14 @@ const SEED = {
         wir: "lernen",
         ihr: "lernt",
         Sie: "lernen",
+      },
+      praeteritum: {
+        ich: "lernte",
+        du: "lerntest",
+        "er/sie/es": "lernte",
+        wir: "lernten",
+        ihr: "lerntet",
+        Sie: "lernten",
       },
       meaning: { eng: "to learn", ind: "belajar" },
     },
@@ -97,6 +138,14 @@ const SEED = {
         ihr: "seid",
         Sie: "sind",
       },
+      praeteritum: {
+        ich: "war",
+        du: "warst",
+        "er/sie/es": "war",
+        wir: "waren",
+        ihr: "wart",
+        Sie: "waren",
+      },
       meaning: { eng: "to be", ind: "adalah / menjadi" },
     },
     {
@@ -111,6 +160,14 @@ const SEED = {
         ihr: "sprecht",
         Sie: "sprechen",
       },
+      praeteritum: {
+        ich: "sprach",
+        du: "sprachst",
+        "er/sie/es": "sprach",
+        wir: "sprachen",
+        ihr: "spracht",
+        Sie: "sprachen",
+      },
       meaning: { eng: "to speak", ind: "berbicara" },
     },
     {
@@ -124,6 +181,14 @@ const SEED = {
         wir: "wohnen",
         ihr: "wohnt",
         Sie: "wohnen",
+      },
+      praeteritum: {
+        ich: "wohnte",
+        du: "wohntest",
+        "er/sie/es": "wohnte",
+        wir: "wohnten",
+        ihr: "wohntet",
+        Sie: "wohnten",
       },
       meaning: { eng: "to live / to reside", ind: "tinggal" },
     },

@@ -19,6 +19,7 @@ function openModal(type, card = null) {
       $("verb-name").value = card.name;
       $("verb-type").value = card.type;
       CONJ_KEYS.forEach((key, i) => { $(CONJ_IDS[i]).value = card.conjugations[key] || ""; });
+      CONJ_KEYS.forEach((key, i) => { $(PRAE_IDS[i]).value = (card.praeteritum && card.praeteritum[key]) || ""; });
       $("verb-eng").value = card.meaning.eng;
       $("verb-ind").value = card.meaning.ind;
     } else if (type === "adjective") {
@@ -51,7 +52,7 @@ function closeModal() {
 }
 
 function clearModal() {
-  ["verb-name", "verb-eng", "verb-ind", ...CONJ_IDS].forEach((id) => { $(id).value = ""; });
+  ["verb-name", "verb-eng", "verb-ind", ...CONJ_IDS, ...PRAE_IDS].forEach((id) => { $(id).value = ""; });
   ["noun-name", "noun-plural", "noun-eng", "noun-ind"].forEach((id) => { $(id).value = ""; });
   ["adj-name", "adj-comparative", "adj-superlative", "adj-eng", "adj-ind"].forEach((id) => { $(id).value = ""; });
   ["adv-name", "adv-eng", "adv-ind"].forEach((id) => { $(id).value = ""; });
@@ -80,11 +81,14 @@ function saveCard() {
     if (!name) { $("verb-name").focus(); return; }
     const conj = {};
     CONJ_KEYS.forEach((key, i) => { conj[key] = $(CONJ_IDS[i]).value.trim(); });
+    const prae = {};
+    CONJ_KEYS.forEach((key, i) => { prae[key] = $(PRAE_IDS[i]).value.trim(); });
     entry = {
       id: state.editingId || genId(),
       name,
       type: $("verb-type").value,
       conjugations: conj,
+      praeteritum: prae,
       meaning: { eng: $("verb-eng").value.trim(), ind: $("verb-ind").value.trim() },
     };
     if (state.editingId) {

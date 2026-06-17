@@ -452,6 +452,15 @@ body {
 .conj-table .subj { color: #bbb; font-size: .78rem; width: 80px; font-weight: 600; }
 .conj-table tr:not(:first-child) td { border-top: 1px solid #f4f4f4; }
 
+.prae-label {
+  font-size: .7rem;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin: .4rem 0 .2rem;
+}
+
 /* ── Card Actions Row ─────────────────────────────────────────── */
 
 .card-actions-row {
