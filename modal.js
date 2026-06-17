@@ -265,32 +265,29 @@ function updateBulkPlaceholder() {
 }
 
 function validateBulkEntry(type, entry) {
-  const m = entry.meaning;
-  if (!m || typeof m.eng !== "string" || typeof m.ind !== "string")
-    return 'Missing or invalid "meaning" — needs { "eng": "...", "ind": "..." }';
+  if (!entry.meaning || !("eng" in entry.meaning) || !("ind" in entry.meaning))
+    return 'Missing "meaning" — needs { "eng": "...", "ind": "..." }';
 
   if (type === "noun") {
-    if (!entry.name)   return 'Missing "name"';
-    if (!entry.plural) return 'Missing "plural"';
-    if (!["maskulin", "feminin", "netral", "neutrum"].includes(entry.gender))
-      return '"gender" must be maskulin, feminin, netral, or neutrum';
+    if (!("name"   in entry)) return 'Missing key "name"';
+    if (!("plural" in entry)) return 'Missing key "plural"';
+    if (!("gender" in entry)) return 'Missing key "gender"';
   } else if (type === "verb") {
-    if (!entry.name) return 'Missing "name"';
-    if (!["regular", "irregular"].includes(entry.type))
-      return '"type" must be regular or irregular';
+    if (!("name" in entry))          return 'Missing key "name"';
+    if (!("type" in entry))          return 'Missing key "type"';
+    if (!("conjugations" in entry))  return 'Missing key "conjugations"';
+    if (!("praeteritum" in entry))   return 'Missing key "praeteritum"';
     for (const key of CONJ_KEYS) {
-      if (!entry.conjugations || typeof entry.conjugations[key] !== "string")
-        return `Missing conjugations["${key}"]`;
-      if (!entry.praeteritum || typeof entry.praeteritum[key] !== "string")
-        return `Missing praeteritum["${key}"]`;
+      if (!(key in entry.conjugations)) return `Missing conjugations["${key}"]`;
+      if (!(key in entry.praeteritum))  return `Missing praeteritum["${key}"]`;
     }
   } else if (type === "adjective") {
-    if (!entry.name) return 'Missing "name"';
-    if (typeof entry.comparative !== "string") return 'Missing "comparative" (use "" if none)';
-    if (typeof entry.superlative !== "string") return 'Missing "superlative" (use "" if none)';
+    if (!("name"        in entry)) return 'Missing key "name"';
+    if (!("comparative" in entry)) return 'Missing key "comparative"';
+    if (!("superlative" in entry)) return 'Missing key "superlative"';
   } else if (type === "adverb") {
-    if (!entry.name)      return 'Missing "name"';
-    if (!entry.adverbType) return 'Missing "adverbType"';
+    if (!("name"       in entry)) return 'Missing key "name"';
+    if (!("adverbType" in entry)) return 'Missing key "adverbType"';
   }
   return null;
 }
