@@ -301,9 +301,15 @@ function saveBulkVocab() {
   let parsed;
   try {
     parsed = JSON.parse(raw);
-  } catch (e) {
-    errorEl.textContent = "Invalid JSON: " + e.message;
-    return;
+  } catch (_) {
+    // Allow pasting a bare comma-separated list of objects without [ ]
+    try {
+      const trimmed = raw.replace(/,\s*$/, ""); // strip trailing comma
+      parsed = JSON.parse("[" + trimmed + "]");
+    } catch (e) {
+      errorEl.textContent = "Invalid JSON: " + e.message;
+      return;
+    }
   }
 
   const entries = Array.isArray(parsed) ? parsed : [parsed];
