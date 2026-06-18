@@ -37,6 +37,8 @@ header {
   min-height: 0;
 }
 
+.card-scene { min-height: 500px; }
+
 /* ── Score bar ───────────────────────────────────────────────────── */
 
 .score-bar {

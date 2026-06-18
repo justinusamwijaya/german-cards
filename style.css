@@ -321,7 +321,7 @@ body {
 .card-scene {
   width: min(480px, 92vw);
   flex: 1;
-  min-height: 0;
+  min-height: 500px;
   perspective: 1200px;
   user-select: none;
   -webkit-user-select: none;
