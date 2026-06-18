@@ -43,6 +43,10 @@ header {
   height: 500px;
 }
 
+@media (max-width: 600px) {
+  .card-scene { height: 250px; }
+}
+
 /* ── Score bar ───────────────────────────────────────────────────── */
 
 .score-bar {

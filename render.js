@@ -3,7 +3,6 @@
 function renderCard() {
   showDeleteConfirm(false);
   $("card-inner").classList.remove("flipped");
-  const _fb = $("btn-flip"); if (_fb) _fb.classList.remove("is-flipped");
 
   const inGroup = state.viewMode === "group-study";
   $("btn-delete-card").textContent      = inGroup ? "✗ Remove"        : "🗑️ Delete";

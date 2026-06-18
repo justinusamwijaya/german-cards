@@ -135,7 +135,6 @@ function clearRevision() {
 
 function renderCard() {
   $id("card-inner").classList.remove("flipped");
-  const _fb = $id("btn-flip"); if (_fb) _fb.classList.remove("is-flipped");
 
   if (cards.length === 0) { showSummary(); return; }
 
@@ -278,36 +277,10 @@ function showSummary() {
   $id("btn-refill-deck").classList.toggle("hidden",  !localStorage.getItem(REVISION_KEY));
 }
 
-// ── Flip interaction — button (desktop/iPad) + swipe (mobile) ─────────────────
+// ── Flip interaction — tap to toggle ─────────────────────────────────────────
 
 const cardInner = $id("card-inner");
-const flipBtn   = $id("btn-flip");
-
-flipBtn.addEventListener("click", () => {
-  cardInner.classList.toggle("flipped");
-  flipBtn.classList.toggle("is-flipped");
-});
-
-let swipeStartX = 0, swipeStartY = 0, swipeDir = null;
-cardInner.addEventListener("touchstart", (e) => {
-  swipeStartX = e.touches[0].clientX;
-  swipeStartY = e.touches[0].clientY;
-  swipeDir = null;
-}, { passive: true });
-cardInner.addEventListener("touchmove", (e) => {
-  if (swipeDir === null) {
-    const dx = Math.abs(e.touches[0].clientX - swipeStartX);
-    const dy = Math.abs(e.touches[0].clientY - swipeStartY);
-    if (dx > 8 || dy > 8) swipeDir = dx > dy ? "h" : "v";
-  }
-  if (swipeDir === "h") e.preventDefault();
-}, { passive: false });
-cardInner.addEventListener("touchend", (e) => {
-  const dx = e.changedTouches[0].clientX - swipeStartX;
-  if (swipeDir === "h" && Math.abs(dx) > 50) {
-    cardInner.classList.toggle("flipped");
-  }
-});
+cardInner.addEventListener("click", () => cardInner.classList.toggle("flipped"));
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 
