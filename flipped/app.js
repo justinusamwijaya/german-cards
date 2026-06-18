@@ -135,6 +135,7 @@ function clearRevision() {
 
 function renderCard() {
   $id("card-inner").classList.remove("flipped");
+  const _fb = $id("btn-flip"); if (_fb) _fb.classList.remove("is-flipped");
 
   if (cards.length === 0) { showSummary(); return; }
 
@@ -172,7 +173,6 @@ function renderNounCard(noun) {
         <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(noun.meaning.eng)}</span></div>
         <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(noun.meaning.ind)}</span></div>
       </div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -200,7 +200,6 @@ function renderVerbCard(verb) {
         <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(verb.meaning.eng)}</span></div>
         <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(verb.meaning.ind)}</span></div>
       </div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -220,7 +219,6 @@ function renderAdjectiveCard(adj) {
         <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(adj.meaning.eng)}</span></div>
         <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(adj.meaning.ind)}</span></div>
       </div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -243,7 +241,6 @@ function renderAdverbCard(adv) {
         <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(adv.meaning.eng)}</span></div>
         <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(adv.meaning.ind)}</span></div>
       </div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -281,17 +278,36 @@ function showSummary() {
   $id("btn-refill-deck").classList.toggle("hidden",  !localStorage.getItem(REVISION_KEY));
 }
 
-// ── Flip interaction ──────────────────────────────────────────────────────────
+// ── Flip interaction — button (desktop/iPad) + swipe (mobile) ─────────────────
 
 const cardInner = $id("card-inner");
-const flip   = () => cardInner.classList.add("flipped");
-const unflip = () => cardInner.classList.remove("flipped");
-cardInner.addEventListener("mousedown",   flip);
-cardInner.addEventListener("mouseup",     unflip);
-cardInner.addEventListener("mouseleave",  unflip);
-cardInner.addEventListener("touchstart",  (e) => { e.preventDefault(); flip(); }, { passive: false });
-cardInner.addEventListener("touchend",    unflip);
-cardInner.addEventListener("touchcancel", unflip);
+const flipBtn   = $id("btn-flip");
+
+flipBtn.addEventListener("click", () => {
+  cardInner.classList.toggle("flipped");
+  flipBtn.classList.toggle("is-flipped");
+});
+
+let swipeStartX = 0, swipeStartY = 0, swipeDir = null;
+cardInner.addEventListener("touchstart", (e) => {
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+  swipeDir = null;
+}, { passive: true });
+cardInner.addEventListener("touchmove", (e) => {
+  if (swipeDir === null) {
+    const dx = Math.abs(e.touches[0].clientX - swipeStartX);
+    const dy = Math.abs(e.touches[0].clientY - swipeStartY);
+    if (dx > 8 || dy > 8) swipeDir = dx > dy ? "h" : "v";
+  }
+  if (swipeDir === "h") e.preventDefault();
+}, { passive: false });
+cardInner.addEventListener("touchend", (e) => {
+  const dx = e.changedTouches[0].clientX - swipeStartX;
+  if (swipeDir === "h" && Math.abs(dx) > 50) {
+    cardInner.classList.toggle("flipped");
+  }
+});
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 

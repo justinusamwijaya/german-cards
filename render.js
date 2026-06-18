@@ -3,6 +3,7 @@
 function renderCard() {
   showDeleteConfirm(false);
   $("card-inner").classList.remove("flipped");
+  const _fb = $("btn-flip"); if (_fb) _fb.classList.remove("is-flipped");
 
   const inGroup = state.viewMode === "group-study";
   $("btn-delete-card").textContent      = inGroup ? "✗ Remove"        : "🗑️ Delete";
@@ -38,7 +39,6 @@ function renderNounCard(noun) {
     `<div class="card-front-inner">
       <span class="badge noun-badge">Nomen</span>
       <div class="card-word"><span class="card-article ${articleClass}">${article}</span> ${noun.name}</div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -72,7 +72,6 @@ function renderVerbCard(verb) {
         <span class="badge ${typeClass}">${verb.type === "irregular" ? "Irregular" : "Regular"}</span>
       </div>
       <div class="card-word">${verb.name}</div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -92,7 +91,6 @@ function renderAdjectiveCard(adj) {
     `<div class="card-front-inner">
       <span class="badge adj-badge">Adjektiv</span>
       <div class="card-word">${adj.name}</div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
@@ -114,7 +112,6 @@ function renderAdverbCard(adv) {
     `<div class="card-front-inner">
       <span class="badge adv-badge">Adverb</span>
       <div class="card-word">${adv.name}</div>
-      <div class="card-hint">hold to reveal</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">

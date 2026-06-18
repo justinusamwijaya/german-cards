@@ -263,16 +263,35 @@ function init() {
   $("btn-back-library").addEventListener("click", goToLibrary);
   $("btn-new-group").addEventListener("click", () => openGroupModal());
 
-  // Card flip (hold to reveal)
+  // Card flip — button (desktop/iPad) + swipe (mobile)
   const cardInner = $("card-inner");
-  const flip   = () => cardInner.classList.add("flipped");
-  const unflip = () => cardInner.classList.remove("flipped");
-  cardInner.addEventListener("mousedown",   flip);
-  cardInner.addEventListener("mouseup",     unflip);
-  cardInner.addEventListener("mouseleave",  unflip);
-  cardInner.addEventListener("touchstart",  (e) => { e.preventDefault(); flip(); }, { passive: false });
-  cardInner.addEventListener("touchend",    unflip);
-  cardInner.addEventListener("touchcancel", unflip);
+  const flipBtn   = $("btn-flip");
+
+  flipBtn.addEventListener("click", () => {
+    cardInner.classList.toggle("flipped");
+    flipBtn.classList.toggle("is-flipped");
+  });
+
+  let swipeStartX = 0, swipeStartY = 0, swipeDir = null;
+  cardInner.addEventListener("touchstart", (e) => {
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+    swipeDir = null;
+  }, { passive: true });
+  cardInner.addEventListener("touchmove", (e) => {
+    if (swipeDir === null) {
+      const dx = Math.abs(e.touches[0].clientX - swipeStartX);
+      const dy = Math.abs(e.touches[0].clientY - swipeStartY);
+      if (dx > 8 || dy > 8) swipeDir = dx > dy ? "h" : "v";
+    }
+    if (swipeDir === "h") e.preventDefault();
+  }, { passive: false });
+  cardInner.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - swipeStartX;
+    if (swipeDir === "h" && Math.abs(dx) > 50) {
+      cardInner.classList.toggle("flipped");
+    }
+  });
 
   // Navigation
   $("btn-prev").addEventListener("click", () => {
