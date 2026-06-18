@@ -2,7 +2,7 @@
 
 header {
   background: white;
-  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
 
@@ -11,19 +11,21 @@ header {
 .deck-select {
   border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  padding: .32rem .6rem;
-  font-size: .82rem;
+  padding: 0.32rem 0.6rem;
+  font-size: 0.82rem;
   font-family: inherit;
   font-weight: 600;
   color: #555;
   background: white;
   cursor: pointer;
   outline: none;
-  transition: border-color .15s;
+  transition: border-color 0.15s;
   max-width: 130px;
 }
 .deck-select:hover,
-.deck-select:focus { border-color: #1a3c5e; }
+.deck-select:focus {
+  border-color: #1a3c5e;
+}
 
 /* ── Training area: fill available height ────────────────────────── */
 
@@ -31,36 +33,44 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .6rem;
+  gap: 0.6rem;
   width: 100%;
   flex: 1;
   min-height: 0;
 }
 
-.card-scene { min-height: 500px; }
+.card-scene {
+  height: 500px;
+}
 
 /* ── Score bar ───────────────────────────────────────────────────── */
 
 .score-bar {
   display: flex;
   gap: 1.5rem;
-  font-size: .82rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #999;
   flex-shrink: 0;
 }
-.score-bar .s-knew   { color: #16a34a; }
-.score-bar .s-didnt  { color: #dc2626; }
-.score-bar .s-remain { color: #1a3c5e; }
+.score-bar .s-knew {
+  color: #16a34a;
+}
+.score-bar .s-didnt {
+  color: #dc2626;
+}
+.score-bar .s-remain {
+  color: #1a3c5e;
+}
 
 /* ── Card counter ────────────────────────────────────────────────── */
 
 .card-counter {
   text-align: center;
-  font-size: .85rem;
+  font-size: 0.85rem;
   color: #bbb;
   flex-shrink: 0;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
 }
 
 /* ── Meaning rows on card front ──────────────────────────────────── */
@@ -68,16 +78,16 @@ header {
 .meaning-rows {
   display: flex;
   flex-direction: column;
-  gap: .4rem;
+  gap: 0.4rem;
   width: 100%;
-  margin: .25rem 0;
+  margin: 0.25rem 0;
 }
 
 .meaning-row {
   display: flex;
   align-items: center;
-  gap: .7rem;
-  padding: .55rem .8rem;
+  gap: 0.7rem;
+  padding: 0.55rem 0.8rem;
   background: #f5f3ef;
   border-radius: 10px;
   font-size: 1.2rem;
@@ -85,7 +95,10 @@ header {
   color: #1a1a1a;
 }
 
-.meaning-row .flag { font-size: 1.1rem; flex-shrink: 0; }
+.meaning-row .flag {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
 
 /* ── Back: German word big and prominent ─────────────────────────── */
 
@@ -99,7 +112,7 @@ header {
 .back-header {
   flex-direction: column;
   align-items: flex-start;
-  gap: .35rem;
+  gap: 0.35rem;
   margin-bottom: 1rem;
 }
 
@@ -107,7 +120,7 @@ header {
 
 .empty-msg {
   color: #aaa;
-  font-size: .95rem;
+  font-size: 0.95rem;
   font-weight: 600;
   text-align: center;
 }
@@ -115,7 +128,14 @@ header {
 /* ── Mobile ──────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  .deck-select  { max-width: 110px; font-size: .78rem; }
-  .meaning-row  { font-size: 1.05rem; }
-  .back-word    { font-size: 1.6rem; }
+  .deck-select {
+    max-width: 110px;
+    font-size: 0.78rem;
+  }
+  .meaning-row {
+    font-size: 1.05rem;
+  }
+  .back-word {
+    font-size: 1.6rem;
+  }
 }
