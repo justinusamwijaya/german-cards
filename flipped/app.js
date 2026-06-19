@@ -16,9 +16,10 @@ let currentGroup = "all";
 
 const $id = (id) => document.getElementById(id);
 
-function isNounCard(c)      { return c.gender      !== undefined; }
-function isAdjectiveCard(c) { return c.comparative !== undefined; }
-function isAdverbCard(c)    { return c.adverbType  !== undefined; }
+function isNounCard(c)         { return c.gender      !== undefined; }
+function isAdjectiveCard(c)    { return c.comparative !== undefined; }
+function isAdverbCard(c)       { return c.adverbType  !== undefined; }
+function isPrepositionCard(c)  { return c.prepCase    !== undefined; }
 
 function escHtml(s) {
   return String(s)
@@ -69,15 +70,17 @@ async function loadData() {
 
 function getDeckCards(deckName) {
   if (deckName === "combined") return [
-    ...(allData.nouns      || []),
-    ...(allData.verbs      || []),
-    ...(allData.adjectives || []),
-    ...(allData.adverbs    || []),
+    ...(allData.nouns         || []),
+    ...(allData.verbs         || []),
+    ...(allData.adjectives    || []),
+    ...(allData.adverbs       || []),
+    ...(allData.prepositions  || []),
   ];
-  if (deckName === "nouns")      return allData.nouns      || [];
-  if (deckName === "verbs")      return allData.verbs      || [];
-  if (deckName === "adjectives") return allData.adjectives || [];
-  if (deckName === "adverbs")    return allData.adverbs    || [];
+  if (deckName === "nouns")        return allData.nouns        || [];
+  if (deckName === "verbs")        return allData.verbs        || [];
+  if (deckName === "adjectives")   return allData.adjectives   || [];
+  if (deckName === "adverbs")      return allData.adverbs      || [];
+  if (deckName === "prepositions") return allData.prepositions || [];
   return [];
 }
 
@@ -143,10 +146,11 @@ function renderCard() {
   $id("btn-prev").disabled = index === 0;
   $id("btn-next").disabled = index === cards.length - 1;
 
-  if      (isNounCard(card))      renderNounCard(card);
-  else if (isAdjectiveCard(card)) renderAdjectiveCard(card);
-  else if (isAdverbCard(card))    renderAdverbCard(card);
-  else                            renderVerbCard(card);
+  if      (isNounCard(card))         renderNounCard(card);
+  else if (isAdjectiveCard(card))    renderAdjectiveCard(card);
+  else if (isAdverbCard(card))       renderAdverbCard(card);
+  else if (isPrepositionCard(card))  renderPrepositionCard(card);
+  else                               renderVerbCard(card);
 
   const ans = answers[card.id];
   $id("btn-knew").classList.toggle("answered", ans === "knew");
@@ -247,6 +251,27 @@ function renderAdverbCard(adv) {
         <span class="back-word">${escHtml(adv.name)}</span>
       </div>
       <div class="back-row"><span class="row-label">Type</span><span>${typeLabel}</span></div>
+    </div>`
+  );
+}
+
+function renderPrepositionCard(prep) {
+  const caseLabel = { dativ: "Dativ", akkusativ: "Akkusativ", "dativ/akkusativ": "Dativ / Akkusativ" }[prep.prepCase] || prep.prepCase;
+
+  setCardContent(
+    `<div class="card-front-inner">
+      <span class="badge prep-badge">Präposition</span>
+      <div class="meaning-rows">
+        <div class="meaning-row"><span class="flag">🇬🇧</span><span>${escHtml(prep.meaning.eng)}</span></div>
+        <div class="meaning-row"><span class="flag">🇮🇩</span><span>${escHtml(prep.meaning.ind)}</span></div>
+      </div>
+    </div>`,
+    `<div class="back-content">
+      <div class="back-header">
+        <span class="badge prep-badge">Präposition</span>
+        <span class="back-word">${escHtml(prep.name)}</span>
+      </div>
+      <div class="back-row"><span class="row-label">Fall</span><span>${caseLabel}</span></div>
     </div>`
   );
 }

@@ -436,6 +436,10 @@ body {
   background: #f3e8ff;
   color: #6b1a9e;
 }
+.prep-badge {
+  background: #fff8e1;
+  color: #7a5c00;
+}
 .reg-badge {
   background: #e6f4ea;
   color: #1a7a3c;

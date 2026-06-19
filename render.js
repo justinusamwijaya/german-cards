@@ -18,10 +18,11 @@ function renderCard() {
   $("btn-prev").disabled = state.index === 0;
   $("btn-next").disabled = state.index === state.cards.length - 1;
 
-  if      (isNounCard(card))      renderNounCard(card);
-  else if (isAdjectiveCard(card)) renderAdjectiveCard(card);
-  else if (isAdverbCard(card))    renderAdverbCard(card);
-  else                            renderVerbCard(card);
+  if      (isNounCard(card))         renderNounCard(card);
+  else if (isAdjectiveCard(card))    renderAdjectiveCard(card);
+  else if (isAdverbCard(card))       renderAdverbCard(card);
+  else if (isPrepositionCard(card))  renderPrepositionCard(card);
+  else                               renderVerbCard(card);
 
   const ans = state.answers[card.id];
   $("btn-knew").classList.toggle("answered", ans === "knew");
@@ -100,6 +101,26 @@ function renderAdjectiveCard(adj) {
       <div class="back-row"><span class="row-label">Superlativ</span><span>${adj.superlative || "—"}</span></div>
       <div class="back-row"><span class="flag">🇬🇧</span><span>${adj.meaning.eng}</span></div>
       <div class="back-row"><span class="flag">🇮🇩</span><span>${adj.meaning.ind}</span></div>
+    </div>`
+  );
+}
+
+function renderPrepositionCard(prep) {
+  const caseLabel = { dativ: "Dativ", akkusativ: "Akkusativ", "dativ/akkusativ": "Dativ / Akkusativ" }[prep.prepCase] || prep.prepCase;
+
+  setCardContent(
+    `<div class="card-front-inner">
+      <span class="badge prep-badge">Präposition</span>
+      <div class="card-word">${prep.name}</div>
+    </div>`,
+    `<div class="back-content">
+      <div class="back-header">
+        <span class="badge prep-badge">Präposition</span>
+        <span class="back-word">${prep.name}</span>
+      </div>
+      <div class="back-row"><span class="row-label">Fall</span><span>${caseLabel}</span></div>
+      <div class="back-row"><span class="flag">🇬🇧</span><span>${prep.meaning.eng}</span></div>
+      <div class="back-row"><span class="flag">🇮🇩</span><span>${prep.meaning.ind}</span></div>
     </div>`
   );
 }

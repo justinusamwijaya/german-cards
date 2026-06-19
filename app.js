@@ -16,8 +16,8 @@ let state = {
 
 // ── Deck constants ────────────────────────────────────────────────────────────
 
-const DECK_CYCLE  = ["nouns", "verbs", "adjectives", "adverbs"];
-const DECK_LABELS = { nouns: "Nouns", verbs: "Verbs", adjectives: "Adjectives", adverbs: "Adverbs", combined: "All" };
+const DECK_CYCLE  = ["nouns", "verbs", "adjectives", "adverbs", "prepositions"];
+const DECK_LABELS = { nouns: "Nouns", verbs: "Verbs", adjectives: "Adjectives", adverbs: "Adverbs", prepositions: "Prepositions", combined: "All" };
 
 // ── View Navigation ───────────────────────────────────────────────────────────
 
@@ -78,17 +78,18 @@ function startDeck(deckName) {
   if (state.viewMode === "group-study") {
     const group      = data.groups.find((g) => g.id === state.activeGroupId);
     const ids        = new Set(group ? group.cardIds : []);
-    const groupCards = [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs]
+    const groupCards = [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs, ...data.prepositions]
       .filter((c) => ids.has(c.id));
 
-    if      (deckName === "combined")   state.cards = groupCards;
-    else if (deckName === "verbs")      state.cards = groupCards.filter((c) => !isNounCard(c) && !isAdjectiveCard(c) && !isAdverbCard(c));
-    else if (deckName === "adjectives") state.cards = groupCards.filter(isAdjectiveCard);
-    else if (deckName === "adverbs")    state.cards = groupCards.filter(isAdverbCard);
-    else                                state.cards = groupCards.filter(isNounCard);
+    if      (deckName === "combined")      state.cards = groupCards;
+    else if (deckName === "verbs")         state.cards = groupCards.filter((c) => !isNounCard(c) && !isAdjectiveCard(c) && !isAdverbCard(c) && !isPrepositionCard(c));
+    else if (deckName === "adjectives")    state.cards = groupCards.filter(isAdjectiveCard);
+    else if (deckName === "adverbs")       state.cards = groupCards.filter(isAdverbCard);
+    else if (deckName === "prepositions")  state.cards = groupCards.filter(isPrepositionCard);
+    else                                   state.cards = groupCards.filter(isNounCard);
   } else {
     state.cards = deckName === "combined"
-      ? [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs]
+      ? [...data.verbs, ...data.nouns, ...data.adjectives, ...data.adverbs, ...data.prepositions]
       : [...data[deckName]];
   }
 
@@ -234,7 +235,7 @@ function init() {
 
   // Add card
   $("btn-add").addEventListener("click", () => {
-    const type = state.deck === "verbs" ? "verb" : state.deck === "adjectives" ? "adjective" : state.deck === "adverbs" ? "adverb" : "noun";
+    const type = state.deck === "verbs" ? "verb" : state.deck === "adjectives" ? "adjective" : state.deck === "adverbs" ? "adverb" : state.deck === "prepositions" ? "preposition" : "noun";
     openModal(type);
   });
 
@@ -291,7 +292,7 @@ function init() {
   // Edit / Delete
   $("btn-edit-card").addEventListener("click", () => {
     const card = state.cards[state.index];
-    openModal(isNounCard(card) ? "noun" : isAdjectiveCard(card) ? "adjective" : isAdverbCard(card) ? "adverb" : "verb", card);
+    openModal(isNounCard(card) ? "noun" : isAdjectiveCard(card) ? "adjective" : isAdverbCard(card) ? "adverb" : isPrepositionCard(card) ? "preposition" : "verb", card);
   });
   $("btn-delete-card").addEventListener("click",  () => showDeleteConfirm(true));
   $("btn-confirm-delete").addEventListener("click", () => guardCUD(deleteCard));

@@ -67,6 +67,13 @@ function searchCards(query) {
     if (m(a.meaning.ind))      add(a, "adverb", "Indonesian", a.meaning.ind);
   });
 
+  (data.prepositions || []).forEach((p) => {
+    if (m(p.name))             add(p, "preposition", null,        p.name);
+    if (m(p.prepCase || ""))   add(p, "preposition", "Fall",      p.prepCase);
+    if (m(p.meaning.eng))      add(p, "preposition", "English",   p.meaning.eng);
+    if (m(p.meaning.ind))      add(p, "preposition", "Indonesian", p.meaning.ind);
+  });
+
   return results.slice(0, 8);
 }
 
@@ -85,8 +92,8 @@ function renderSearchDropdown(results, query) {
   }
 
   dd.innerHTML = results.map((r) => {
-    const badgeClass = r.type === "verb" ? "verb-badge" : r.type === "adjective" ? "adj-badge" : r.type === "adverb" ? "adv-badge" : "noun-badge";
-    const badgeLabel = r.type === "verb" ? "Verb"       : r.type === "adjective" ? "Adj"       : r.type === "adverb" ? "Adv"       : "Noun";
+    const badgeClass = r.type === "verb" ? "verb-badge" : r.type === "adjective" ? "adj-badge" : r.type === "adverb" ? "adv-badge" : r.type === "preposition" ? "prep-badge" : "noun-badge";
+    const badgeLabel = r.type === "verb" ? "Verb"       : r.type === "adjective" ? "Adj"       : r.type === "adverb" ? "Adv"       : r.type === "preposition" ? "Prep"        : "Noun";
     const matchHtml  = r.matchLabel
       ? `<span class="search-result-match">${escapeHtml(r.matchLabel)} · ${highlightMatch(r.matchValue, query)}</span>`
       : "";
@@ -108,7 +115,7 @@ function renderSearchDropdown(results, query) {
 }
 
 function navigateToCard(cardId, cardType) {
-  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
+  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs", preposition: "prepositions" };
   const targetDeck = typeToKey[cardType] || "nouns";
   if (state.deck !== targetDeck) switchDeck(targetDeck);
   const idx = state.cards.findIndex((c) => c.id === cardId);

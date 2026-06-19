@@ -149,6 +149,7 @@
         <button class="type-btn" data-type="noun">Noun</button>
         <button class="type-btn" data-type="adjective">Adjective</button>
         <button class="type-btn" data-type="adverb">Adverb</button>
+        <button class="type-btn" data-type="preposition">Preposition</button>
       </div>
 
       <!-- Verb Form -->
@@ -245,6 +246,30 @@
         </div>
       </div>
 
+      <!-- Preposition Form -->
+      <div id="preposition-form" class="hidden">
+        <div class="form-group">
+          <label>Präposition</label>
+          <input type="text" id="prep-name" placeholder="e.g. bei">
+        </div>
+        <div class="form-group">
+          <label>Case</label>
+          <select id="prep-case">
+            <option value="dativ">Dativ</option>
+            <option value="akkusativ">Akkusativ</option>
+            <option value="dativ/akkusativ">Dativ / Akkusativ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Meaning (English)</label>
+          <input type="text" id="prep-eng" placeholder="at / near / with">
+        </div>
+        <div class="form-group">
+          <label>Meaning (Indonesian)</label>
+          <input type="text" id="prep-ind" placeholder="di / dekat / dengan">
+        </div>
+      </div>
+
       <!-- Adjective Form -->
       <div id="adjective-form" class="hidden">
         <div class="form-group">
@@ -312,6 +337,7 @@
           <option value="verb">Verb</option>
           <option value="adjective">Adjective</option>
           <option value="adverb">Adverb</option>
+          <option value="preposition">Preposition</option>
         </select>
       </div>
       <div class="form-group">

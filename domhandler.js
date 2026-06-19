@@ -32,6 +32,7 @@ function shuffle(arr) {
 
 // ── Card type detectors ───────────────────────────────────────────────────────
 
-function isNounCard(card)      { return card.gender      !== undefined; }
-function isAdjectiveCard(card) { return card.comparative !== undefined; }
-function isAdverbCard(card)    { return card.adverbType  !== undefined; }
+function isNounCard(card)         { return card.gender      !== undefined; }
+function isAdjectiveCard(card)    { return card.comparative !== undefined; }
+function isAdverbCard(card)       { return card.adverbType  !== undefined; }
+function isPrepositionCard(card)  { return card.prepCase    !== undefined; }

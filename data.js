@@ -288,6 +288,7 @@ const SEED = {
   ],
   adjectives: [],
   adverbs: [],
+  prepositions: [],
   groups: [],
 };
 
@@ -305,6 +306,7 @@ function loadData() {
   if (!data.groups) data.groups = [];
   if (!data.adjectives) data.adjectives = [];
   if (!data.adverbs) data.adverbs = [];
+  if (!data.prepositions) data.prepositions = [];
   return data;
 }
 

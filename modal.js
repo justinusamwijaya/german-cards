@@ -33,6 +33,11 @@ function openModal(type, card = null) {
       $("adv-type").value = card.adverbType || "modal";
       $("adv-eng").value  = card.meaning.eng;
       $("adv-ind").value  = card.meaning.ind;
+    } else if (type === "preposition") {
+      $("prep-name").value = card.name;
+      $("prep-case").value = card.prepCase || "dativ";
+      $("prep-eng").value  = card.meaning.eng;
+      $("prep-ind").value  = card.meaning.ind;
     } else {
       $("noun-name").value   = card.name;
       $("noun-plural").value = card.plural;
@@ -43,7 +48,7 @@ function openModal(type, card = null) {
   }
 
   show("modal-overlay");
-  (type === "verb" ? $("verb-name") : type === "adjective" ? $("adj-name") : type === "adverb" ? $("adv-name") : $("noun-name")).focus();
+  (type === "verb" ? $("verb-name") : type === "adjective" ? $("adj-name") : type === "adverb" ? $("adv-name") : type === "preposition" ? $("prep-name") : $("noun-name")).focus();
 }
 
 function closeModal() {
@@ -56,17 +61,20 @@ function clearModal() {
   ["noun-name", "noun-plural", "noun-eng", "noun-ind"].forEach((id) => { $(id).value = ""; });
   ["adj-name", "adj-comparative", "adj-superlative", "adj-eng", "adj-ind"].forEach((id) => { $(id).value = ""; });
   ["adv-name", "adv-eng", "adv-ind"].forEach((id) => { $(id).value = ""; });
+  ["prep-name", "prep-eng", "prep-ind"].forEach((id) => { $(id).value = ""; });
   $("verb-type").value  = "regular";
   $("noun-gender").value = "maskulin";
   $("adv-type").value   = "modal";
+  $("prep-case").value  = "dativ";
 }
 
 function switchModalType(type) {
   state.modalType = type;
-  setVisible("verb-form",      type === "verb");
-  setVisible("noun-form",      type === "noun");
-  setVisible("adjective-form", type === "adjective");
-  setVisible("adverb-form",    type === "adverb");
+  setVisible("verb-form",        type === "verb");
+  setVisible("noun-form",        type === "noun");
+  setVisible("adjective-form",   type === "adjective");
+  setVisible("adverb-form",      type === "adverb");
+  setVisible("preposition-form", type === "preposition");
   document.querySelectorAll(".type-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
@@ -131,6 +139,22 @@ function saveCard() {
       data.adverbs.push(entry);
     }
 
+  } else if (state.modalType === "preposition") {
+    const name = $("prep-name").value.trim();
+    if (!name) { $("prep-name").focus(); return; }
+    entry = {
+      id: state.editingId || genId(),
+      name,
+      prepCase: $("prep-case").value,
+      meaning: { eng: $("prep-eng").value.trim(), ind: $("prep-ind").value.trim() },
+    };
+    if (state.editingId) {
+      const idx = data.prepositions.findIndex((p) => p.id === state.editingId);
+      if (idx !== -1) data.prepositions[idx] = entry;
+    } else {
+      data.prepositions.push(entry);
+    }
+
   } else {
     const name = $("noun-name").value.trim();
     if (!name) { $("noun-name").focus(); return; }
@@ -158,7 +182,7 @@ function saveCard() {
   saveData(data);
   closeModal();
 
-  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
+  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs", preposition: "prepositions" };
   if (state.editingId && state.deck) {
     const updated = loadData()[
       state.deck === "combined" ? typeToKey[state.modalType] || "nouns" : state.deck
@@ -179,7 +203,7 @@ function deleteCard() {
   }
   const card    = state.cards[state.index];
   const data    = loadData();
-  const listKey = isNounCard(card) ? "nouns" : isAdjectiveCard(card) ? "adjectives" : isAdverbCard(card) ? "adverbs" : "verbs";
+  const listKey = isNounCard(card) ? "nouns" : isAdjectiveCard(card) ? "adjectives" : isAdverbCard(card) ? "adverbs" : isPrepositionCard(card) ? "prepositions" : "verbs";
   data[listKey] = data[listKey].filter((c) => c.id !== card.id);
   saveData(data);
   state.cards.splice(state.index, 1);
@@ -245,6 +269,11 @@ const BULK_PLACEHOLDERS = {
   "adverbType": "lokal",
   "meaning": { "eng": "there", "ind": "di sana" }
 }`,
+  preposition: `{
+  "name": "bei",
+  "prepCase": "dativ",
+  "meaning": { "eng": "at / near / with", "ind": "di / dekat / dengan" }
+}`,
 };
 
 function openBulkModal() {
@@ -288,6 +317,9 @@ function validateBulkEntry(type, entry) {
   } else if (type === "adverb") {
     if (!("name"       in entry)) return 'Missing key "name"';
     if (!("adverbType" in entry)) return 'Missing key "adverbType"';
+  } else if (type === "preposition") {
+    if (!("name"     in entry)) return 'Missing key "name"';
+    if (!("prepCase" in entry)) return 'Missing key "prepCase"';
   }
   return null;
 }
@@ -322,7 +354,7 @@ function saveBulkVocab() {
   }
 
   const data = loadData();
-  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs" };
+  const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs", preposition: "prepositions" };
   const key = typeToKey[type];
 
   for (const entry of entries) {
@@ -341,8 +373,10 @@ function importData(file) {
     try {
       const data = JSON.parse(e.target.result);
       if (!Array.isArray(data.verbs) || !Array.isArray(data.nouns)) throw new Error();
-      if (!data.groups)     data.groups     = [];
-      if (!data.adjectives) data.adjectives = [];
+      if (!data.groups)       data.groups       = [];
+      if (!data.adjectives)   data.adjectives   = [];
+      if (!data.adverbs)      data.adverbs      = [];
+      if (!data.prepositions) data.prepositions = [];
       saveData(data);
       switchDeck(state.deck);
     } catch {

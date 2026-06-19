@@ -90,10 +90,11 @@ function renderCardPicker(query) {
   const q    = normalizeSearch(query).trim();
 
   const allCards = [
-    ...data.verbs.map((c)       => ({ ...c, _type: "verb" })),
-    ...data.nouns.map((c)       => ({ ...c, _type: "noun" })),
-    ...data.adjectives.map((c)  => ({ ...c, _type: "adjective" })),
-    ...data.adverbs.map((c)     => ({ ...c, _type: "adverb" })),
+    ...data.verbs.map((c)            => ({ ...c, _type: "verb" })),
+    ...data.nouns.map((c)            => ({ ...c, _type: "noun" })),
+    ...data.adjectives.map((c)       => ({ ...c, _type: "adjective" })),
+    ...data.adverbs.map((c)          => ({ ...c, _type: "adverb" })),
+    ...(data.prepositions || []).map((c) => ({ ...c, _type: "preposition" })),
   ].filter((c) => {
     if (!q) return true;
     const prefix = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
@@ -112,8 +113,8 @@ function renderCardPicker(query) {
 
   list.innerHTML = allCards.map((c) => {
     const sel       = _groupSelectedIds.has(c.id);
-    const badgeCls  = c._type === "noun" ? "noun-badge" : c._type === "adjective" ? "adj-badge" : c._type === "adverb" ? "adv-badge" : "verb-badge";
-    const typeLabel = c._type === "noun" ? "Noun"       : c._type === "adjective" ? "Adj"       : c._type === "adverb" ? "Adv"       : "Verb";
+    const badgeCls  = c._type === "noun" ? "noun-badge" : c._type === "adjective" ? "adj-badge" : c._type === "adverb" ? "adv-badge" : c._type === "preposition" ? "prep-badge" : "verb-badge";
+    const typeLabel = c._type === "noun" ? "Noun"       : c._type === "adjective" ? "Adj"       : c._type === "adverb" ? "Adv"       : c._type === "preposition" ? "Prep"        : "Verb";
     const prefix    = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
     return `<div class="picker-item${sel ? " selected" : ""}" data-id="${c.id}">
       <span class="badge ${badgeCls}">${typeLabel}</span>
