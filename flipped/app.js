@@ -193,6 +193,10 @@ function renderVerbCard(verb) {
     s => `<tr><td class="subj">${s}</td><td>${escHtml(verb.conjugations[s] || "—")}</td></tr>`
   ).join("");
 
+  const partizip2Section = verb.partizip2
+    ? `<div class="prae-label">Partizip II</div><div class="partizip2-val">${escHtml(verb.partizip2)}</div>`
+    : "";
+
   setCardContent(
     `<div class="card-front-inner">
       <div class="badge-row">
@@ -210,6 +214,7 @@ function renderVerbCard(verb) {
         <span class="back-word">${escHtml(verb.name)}</span>
       </div>
       <table class="conj-table">${conjRows}</table>
+      ${partizip2Section}
     </div>`
   );
 }

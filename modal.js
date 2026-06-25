@@ -20,6 +20,7 @@ function openModal(type, card = null) {
       $("verb-type").value = card.type;
       CONJ_KEYS.forEach((key, i) => { $(CONJ_IDS[i]).value = card.conjugations[key] || ""; });
       CONJ_KEYS.forEach((key, i) => { $(PRAE_IDS[i]).value = (card.praeteritum && card.praeteritum[key]) || ""; });
+      $("verb-partizip2").value = card.partizip2 || "";
       $("verb-eng").value = card.meaning.eng;
       $("verb-ind").value = card.meaning.ind;
     } else if (type === "adjective") {
@@ -57,7 +58,7 @@ function closeModal() {
 }
 
 function clearModal() {
-  ["verb-name", "verb-eng", "verb-ind", ...CONJ_IDS, ...PRAE_IDS].forEach((id) => { $(id).value = ""; });
+  ["verb-name", "verb-partizip2", "verb-eng", "verb-ind", ...CONJ_IDS, ...PRAE_IDS].forEach((id) => { $(id).value = ""; });
   ["noun-name", "noun-plural", "noun-eng", "noun-ind"].forEach((id) => { $(id).value = ""; });
   ["adj-name", "adj-comparative", "adj-superlative", "adj-eng", "adj-ind"].forEach((id) => { $(id).value = ""; });
   ["adv-name", "adv-eng", "adv-ind"].forEach((id) => { $(id).value = ""; });
@@ -97,6 +98,7 @@ function saveCard() {
       type: $("verb-type").value,
       conjugations: conj,
       praeteritum: prae,
+      partizip2: $("verb-partizip2").value.trim(),
       meaning: { eng: $("verb-eng").value.trim(), ind: $("verb-ind").value.trim() },
     };
     if (state.editingId) {
@@ -256,6 +258,7 @@ const BULK_PLACEHOLDERS = {
     "ich": "ging", "du": "gingst", "er/sie/es": "ging",
     "wir": "gingen", "ihr": "gingt", "Sie": "gingen"
   },
+  "partizip2": "gegangen",
   "meaning": { "eng": "to go", "ind": "pergi" }
 }`,
   adjective: `{

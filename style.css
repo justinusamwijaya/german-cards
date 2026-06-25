@@ -572,6 +572,13 @@ body {
   margin: 0.4rem 0 0.2rem;
 }
 
+.partizip2-val {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0.15rem 0 0.6rem;
+}
+
 /* ── Card Actions Row ─────────────────────────────────────────── */
 
 .card-actions-row {

@@ -64,6 +64,9 @@ function renderVerbCard(verb) {
   const praeSection = praeRows
     ? `<div class="prae-label">Präteritum</div><table class="conj-table">${praeRows}</table>`
     : "";
+  const partizip2Section = verb.partizip2
+    ? `<div class="prae-label">Partizip II</div><div class="partizip2-val">${verb.partizip2}</div>`
+    : "";
 
   setCardContent(
     `<div class="card-front-inner">
@@ -80,6 +83,7 @@ function renderVerbCard(verb) {
       </div>
       <table class="conj-table">${conjRows}</table>
       ${praeSection}
+      ${partizip2Section}
       <div class="back-row"><span class="flag">🇬🇧</span><span>${verb.meaning.eng}</span></div>
       <div class="back-row"><span class="flag">🇮🇩</span><span>${verb.meaning.ind}</span></div>
     </div>`
