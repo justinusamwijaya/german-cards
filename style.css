@@ -1542,6 +1542,11 @@ body {
     display: flex;
   }
 
+  /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
   /* Full-width search dropdown pinned below header */
   .search-dropdown {
     position: fixed;
