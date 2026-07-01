@@ -19,6 +19,15 @@ function highlightMatch(text, query) {
   );
 }
 
+// Returns 0 (exact) → 1 (prefix) → 2+ (substring by position) → Infinity (no match)
+function nameScore(name, q) {
+  const n = normalizeSearch(name);
+  if (n === q) return 0;
+  if (n.startsWith(q)) return 1;
+  const i = n.indexOf(q);
+  return i !== -1 ? 2 + i * 0.001 : Infinity;
+}
+
 function searchCards(query) {
   const q = normalizeSearch(query).trim();
   if (!q) return [];
@@ -29,7 +38,10 @@ function searchCards(query) {
   function add(card, type, matchLabel, matchValue) {
     if (seen.has(card.id)) return;
     seen.add(card.id);
-    results.push({ card, type, matchLabel, matchValue });
+    const base = nameScore(card.name, q);
+    // Name match: use base score. Secondary field match: push to bottom tier.
+    const score = matchLabel === null ? base : base + 10;
+    results.push({ card, type, matchLabel, matchValue, score });
   }
 
   const m = (s) => normalizeSearch(s).includes(q);
@@ -74,6 +86,7 @@ function searchCards(query) {
     if (m(p.meaning.ind))      add(p, "preposition", "Indonesian", p.meaning.ind);
   });
 
+  results.sort((a, b) => a.score - b.score);
   return results.slice(0, 8);
 }
 
