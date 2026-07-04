@@ -361,7 +361,6 @@ body {
 
 .card-scene {
   width: min(480px, 92vw);
-  flex: 1;
   height: 500px;
   perspective: 1200px;
   cursor: pointer;
@@ -1440,7 +1439,7 @@ body {
 /* ── Mobile modals (bottom sheet) ────────────────────────────── */
 
 @media (max-width: 600px) {
-  .card-scene { height: 250px; }
+  .card-scene { height: 250px; min-height: 200px; }
 }
 
 @media (max-width: 600px) {
