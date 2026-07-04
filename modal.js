@@ -279,11 +279,27 @@ const BULK_PLACEHOLDERS = {
 }`,
 };
 
+const BULK_PLACEHOLDER_COMBINED = `{
+  "nouns": [ ${BULK_PLACEHOLDERS.noun} ],
+  "verbs": [ ${BULK_PLACEHOLDERS.verb} ],
+  "adjectives": [ ${BULK_PLACEHOLDERS.adjective} ],
+  "adverbs": [ ${BULK_PLACEHOLDERS.adverb} ],
+  "prepositions": [ ${BULK_PLACEHOLDERS.preposition} ]
+}`;
+
+const BULK_KEY_TO_TYPE = { nouns: "noun", verbs: "verb", adjectives: "adjective", adverbs: "adverb", prepositions: "preposition" };
+
 function openBulkModal() {
+  $("bulk-add-mode").value = "single";
   $("bulk-vocab-type").value = "noun";
+  $("bulk-input-type").value = "text";
+  $("bulk-vocab-file").value = "";
+  hide("bulk-vocab-file");
+  show("bulk-single-fields");
+  hide("bulk-combined-fields");
   $("bulk-vocab-json").value = "";
   $("bulk-vocab-error").textContent = "";
-  $("bulk-vocab-json").placeholder = BULK_PLACEHOLDERS.noun;
+  updateBulkPlaceholder();
   show("modal-bulk-overlay");
   $("bulk-vocab-json").focus();
 }
@@ -292,8 +308,29 @@ function closeBulkModal() {
   hide("modal-bulk-overlay");
 }
 
+function updateBulkAddMode() {
+  const combined = $("bulk-add-mode").value === "combined";
+  if (combined) { hide("bulk-single-fields"); show("bulk-combined-fields"); }
+  else          { show("bulk-single-fields"); hide("bulk-combined-fields"); }
+  updateBulkPlaceholder();
+}
+
+function updateBulkInputType() {
+  if ($("bulk-input-type").value === "file") show("bulk-vocab-file");
+  else hide("bulk-vocab-file");
+}
+
+function loadBulkFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { $("bulk-vocab-json").value = e.target.result; };
+  reader.readAsText(file);
+}
+
 function updateBulkPlaceholder() {
-  $("bulk-vocab-json").placeholder = BULK_PLACEHOLDERS[$("bulk-vocab-type").value] || "";
+  $("bulk-vocab-json").placeholder = $("bulk-add-mode").value === "combined"
+    ? BULK_PLACEHOLDER_COMBINED
+    : BULK_PLACEHOLDERS[$("bulk-vocab-type").value] || "";
 }
 
 function validateBulkEntry(type, entry) {
@@ -328,6 +365,8 @@ function validateBulkEntry(type, entry) {
 }
 
 function saveBulkVocab() {
+  if ($("bulk-add-mode").value === "combined") { saveBulkVocabCombined(); return; }
+
   const type    = $("bulk-vocab-type").value;
   const raw     = $("bulk-vocab-json").value.trim();
   const errorEl = $("bulk-vocab-error");
@@ -368,6 +407,53 @@ function saveBulkVocab() {
   saveData(data);
   closeBulkModal();
   switchDeck(key);
+}
+
+function saveBulkVocabCombined() {
+  const raw     = $("bulk-vocab-json").value.trim();
+  const errorEl = $("bulk-vocab-error");
+  errorEl.textContent = "";
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    errorEl.textContent = "Invalid JSON: " + e.message;
+    return;
+  }
+
+  const keys = Object.keys(BULK_KEY_TO_TYPE);
+  for (const key of keys) {
+    if (key in parsed && !Array.isArray(parsed[key])) {
+      errorEl.textContent = `"${key}" must be an array`;
+      return;
+    }
+  }
+
+  for (const key of keys) {
+    const entries = parsed[key] || [];
+    const type = BULK_KEY_TO_TYPE[key];
+    for (let i = 0; i < entries.length; i++) {
+      const err = validateBulkEntry(type, entries[i]);
+      if (err) {
+        errorEl.textContent = `${key}[${i + 1}]: ${err}`;
+        return;
+      }
+    }
+  }
+
+  const data = loadData();
+  for (const key of keys) {
+    const entries = parsed[key] || [];
+    for (const entry of entries) {
+      const { id: _ignored, ...rest } = entry;
+      data[key].push({ id: genId(), ...rest });
+    }
+  }
+
+  saveData(data);
+  closeBulkModal();
+  switchDeck(state.deck);
 }
 
 function importData(file) {

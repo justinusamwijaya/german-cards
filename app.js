@@ -247,6 +247,9 @@ function init() {
     if (e.target === $("modal-bulk-overlay")) closeBulkModal();
   });
   $("bulk-vocab-type").addEventListener("change", updateBulkPlaceholder);
+  $("bulk-add-mode").addEventListener("change", updateBulkAddMode);
+  $("bulk-input-type").addEventListener("change", updateBulkInputType);
+  $("bulk-vocab-file").addEventListener("change", (e) => loadBulkFile(e.target.files[0]));
 
   // Export / Import
   $("btn-export").addEventListener("click", exportData);

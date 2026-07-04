@@ -336,6 +336,13 @@
     <div class="modal">
       <h2>Add Vocab</h2>
       <div class="form-group">
+        <label>Add Mode</label>
+        <select id="bulk-add-mode">
+          <option value="single">Single Type</option>
+          <option value="combined">Combined (All Types)</option>
+        </select>
+      </div>
+      <div id="bulk-single-fields" class="form-group">
         <label>Type of Vocab</label>
         <select id="bulk-vocab-type">
           <option value="noun">Noun</option>
@@ -344,6 +351,14 @@
           <option value="adverb">Adverb</option>
           <option value="preposition">Preposition</option>
         </select>
+      </div>
+      <div id="bulk-combined-fields" class="form-group hidden">
+        <label>Type of Input</label>
+        <select id="bulk-input-type">
+          <option value="text">Text</option>
+          <option value="file">File Upload</option>
+        </select>
+        <input type="file" id="bulk-vocab-file" accept=".txt,.json" class="hidden" style="margin-top:.5rem;">
       </div>
       <div class="form-group">
         <label>Vocab JSON</label>
