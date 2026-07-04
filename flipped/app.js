@@ -282,6 +282,8 @@ function renderPrepositionCard(prep) {
 }
 
 function updateScore() {
+  const knew  = cards.filter(c => answers[c.id] === "knew").length;
+  const didnt = cards.filter(c => answers[c.id] === "didnt").length;
   $id("score-knew").textContent   = knew;
   $id("score-didnt").textContent  = didnt;
   $id("score-remain").textContent = Math.max(0, cards.length - index - 1);
@@ -289,17 +291,14 @@ function updateScore() {
 
 function markCard(answer) {
   const card = cards[index];
-  const prev = answers[card.id];
-  if (prev === "knew")  knew--;
-  if (prev === "didnt") didnt--;
-  if (answer === "knew")  knew++;
-  if (answer === "didnt") didnt++;
   answers[card.id] = answer;
 }
 
 function showSummary() {
   $id("training-area").style.display = "none";
   $id("summary-wrap").classList.remove("hidden");
+  const knew  = cards.filter(c => answers[c.id] === "knew").length;
+  const didnt = cards.filter(c => answers[c.id] === "didnt").length;
   $id("summary-text").textContent = `✓ Knew: ${knew}  ✗ Didn't: ${didnt}  · Total: ${cards.length}`;
 
   const missed = cards.filter(c => answers[c.id] === "didnt");

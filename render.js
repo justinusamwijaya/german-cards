@@ -154,7 +154,9 @@ function renderAdverbCard(adv) {
 function showSummary() {
   hide("study-content");
   show("summary-wrap");
-  setText("summary-text", `✓ Knew: ${state.knew}  ✗ Didn't: ${state.didnt}  · Total: ${state.cards.length}`);
+  const knew  = state.cards.filter(c => state.answers[c.id] === "knew").length;
+  const didnt = state.cards.filter(c => state.answers[c.id] === "didnt").length;
+  setText("summary-text", `✓ Knew: ${knew}  ✗ Didn't: ${didnt}  · Total: ${state.cards.length}`);
 
   const missed  = state.cards.filter((c) => state.answers[c.id] === "didnt");
   const listEl  = $("summary-missed-list");
@@ -187,16 +189,13 @@ function showDeleteConfirm(show) {
 
 function markCard(answer) {
   const card = state.cards[state.index];
-  const prev = state.answers[card.id];
-  if (prev === "knew")  state.knew--;
-  if (prev === "didnt") state.didnt--;
-  if (answer === "knew")  state.knew++;
-  if (answer === "didnt") state.didnt++;
   state.answers[card.id] = answer;
 }
 
 function updateScoreDisplay() {
-  setText("score-knew",  `✓ ${state.knew}`);
-  setText("score-didnt", `✗ ${state.didnt}`);
+  const knew  = state.cards.filter(c => state.answers[c.id] === "knew").length;
+  const didnt = state.cards.filter(c => state.answers[c.id] === "didnt").length;
+  setText("score-knew",  `✓ ${knew}`);
+  setText("score-didnt", `✗ ${didnt}`);
   setText("score-total", `out of ${state.cards.length}`);
 }
