@@ -73,6 +73,7 @@ function clearModal() {
   $("prep-case").value  = "dativ";
   $("ai-word").value    = "";
   resetAiPreview();
+  setVisible("ai-key-editor", false);
 }
 
 function switchModalType(type) {

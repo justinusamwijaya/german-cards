@@ -15,21 +15,35 @@ function getStoredAiKey() {
   return localStorage.getItem(AI_KEY_STORAGE) || "";
 }
 
-function promptAiKey() {
-  const key = window.prompt(
-    getStoredAiKey()
-      ? "Anthropic API key (paste a new one, or leave empty to remove):"
-      : "Paste your Anthropic API key (stored only in this browser):"
-  );
-  if (key === null) return getStoredAiKey();
-  const trimmed = key.trim();
-  if (!trimmed) {
-    localStorage.removeItem(AI_KEY_STORAGE);
-    window.alert("API key removed.");
-    return "";
+// In-modal key editor (no window.prompt — unusable on mobile browsers)
+
+function updateAiKeyStatus() {
+  setText("ai-key-status", getStoredAiKey() ? "· saved ✓" : "· none");
+}
+
+function toggleAiKeyEditor(open) {
+  const show = open !== undefined ? open : $("ai-key-editor").classList.contains("hidden");
+  setVisible("ai-key-editor", show);
+  if (show) {
+    updateAiKeyStatus();
+    $("ai-key-input").value = "";
+    $("ai-key-input").focus();
   }
-  localStorage.setItem(AI_KEY_STORAGE, trimmed);
-  return trimmed;
+}
+
+function saveAiKeyFromInput() {
+  const key = $("ai-key-input").value.trim();
+  if (!key) { $("ai-key-input").focus(); return; }
+  localStorage.setItem(AI_KEY_STORAGE, key);
+  $("ai-key-input").value = "";
+  toggleAiKeyEditor(false);
+  setText("ai-error", "");
+}
+
+function removeAiKey() {
+  localStorage.removeItem(AI_KEY_STORAGE);
+  $("ai-key-input").value = "";
+  updateAiKeyStatus();
 }
 
 // ── JSON Schemas (structured outputs) ─────────────────────────────────────────
@@ -150,9 +164,11 @@ const AI_SYSTEM_PROMPT =
 // ── API Call ──────────────────────────────────────────────────────────────────
 
 async function generateAiEntry(type, word) {
-  let key = getStoredAiKey();
-  if (!key) key = promptAiKey();
-  if (!key) throw new Error("No API key set. Click 🔑 to add one.");
+  const key = getStoredAiKey();
+  if (!key) {
+    toggleAiKeyEditor(true);
+    throw new Error("Paste your Anthropic API key first, then hit Generate again.");
+  }
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -174,8 +190,9 @@ async function generateAiEntry(type, word) {
   });
 
   if (res.status === 401) {
-    localStorage.removeItem(AI_KEY_STORAGE);
-    throw new Error("Invalid API key — it has been cleared. Click 🔑 to paste it again.");
+    removeAiKey();
+    toggleAiKeyEditor(true);
+    throw new Error("Invalid API key — it has been cleared. Paste it again.");
   }
   if (!res.ok) {
     let msg = `API error (${res.status})`;
@@ -205,6 +222,7 @@ function setAiMode(on) {
 function resetAiPreview() {
   aiPendingEntry = null;
   hide("ai-preview");
+  hide("ai-mismatch");
   show("ai-input-row");
   setText("ai-error", "");
 }
@@ -223,20 +241,19 @@ async function aiGenerate() {
     const result = await generateAiEntry(state.modalType, word);
     const entry = result.entry;
     const type = AI_SCHEMAS[result.type] ? result.type : state.modalType;
+    aiPendingEntry = { type, entry };
 
-    // Word exists as a different class than selected — confirm before switching
+    // Word exists as a different class than selected — ask in-modal before switching
     if (type !== state.modalType) {
-      const ok = window.confirm(
-        `"${word}" doesn't seem to be a ${state.modalType}.\nDo you mean ${entry.name} (${type})?`
-      );
-      if (!ok) {
-        setText("ai-error", "Not added — try another word or type.");
-        return;
-      }
-      switchModalType(type); // updates state.modalType + active type buttons
+      $("ai-mismatch-text").innerHTML =
+        `"<b>${escapeHtml(word)}</b>" doesn't seem to be a ${escapeHtml(state.modalType)}.<br>` +
+        `Do you mean <b>${escapeHtml(entry.name)}</b> (${escapeHtml(type)})?`;
+      hide("ai-input-row");
+      show("ai-mismatch");
+      $("btn-ai-mismatch-yes").focus();
+      return;
     }
 
-    aiPendingEntry = { type, entry };
     renderAiPreview(type, entry);
     hide("ai-input-row");
     show("ai-preview");
@@ -288,6 +305,23 @@ function renderAiPreview(type, entry) {
     <div class="ai-question">Add <b>${title}</b> — ${meanings}?</div>
     ${badge ? `<span class="ai-badge">${badge}</span>` : ""}
     ${details}`;
+}
+
+// ── Mismatch Yes / No ─────────────────────────────────────────────────────────
+
+function confirmAiMismatch() {
+  if (!aiPendingEntry) return;
+  hide("ai-mismatch");
+  switchModalType(aiPendingEntry.type); // updates state.modalType + active type buttons
+  renderAiPreview(aiPendingEntry.type, aiPendingEntry.entry);
+  show("ai-preview");
+  $("btn-ai-accept").focus();
+}
+
+function declineAiMismatch() {
+  resetAiPreview();
+  setText("ai-error", "Not added — try another word or type.");
+  $("ai-word").focus();
 }
 
 // ── Accept / Edit / Cancel ────────────────────────────────────────────────────

@@ -213,6 +213,25 @@
           </button>
         </div>
 
+        <!-- API key editor (in-modal, replaces window.prompt) -->
+        <div id="ai-key-editor" class="hidden">
+          <div class="form-group">
+            <label>Anthropic API key <span id="ai-key-status"></span></label>
+            <input
+              type="password"
+              id="ai-key-input"
+              placeholder="sk-ant-…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class="ai-preview-actions">
+            <button id="btn-ai-key-save">Save</button>
+            <button id="btn-ai-key-remove">Remove</button>
+            <button id="btn-ai-key-cancel">Cancel</button>
+          </div>
+        </div>
+
         <!-- AI panel (word input → preview → accept) -->
         <div id="ai-panel" class="hidden">
           <div id="ai-input-row">
@@ -228,6 +247,14 @@
             </div>
             <button id="btn-ai-generate">✨ Generate</button>
             <div id="ai-error"></div>
+          </div>
+          <!-- Wrong-type confirmation (in-modal, replaces window.confirm) -->
+          <div id="ai-mismatch" class="hidden">
+            <div id="ai-mismatch-text"></div>
+            <div class="ai-preview-actions">
+              <button id="btn-ai-mismatch-yes">✓ Yes</button>
+              <button id="btn-ai-mismatch-no">✗ No</button>
+            </div>
           </div>
           <div id="ai-preview" class="hidden">
             <div id="ai-preview-content"></div>

@@ -360,11 +360,18 @@ function init() {
 
   // AI mode (switch → generate → preview → accept)
   $("ai-mode-toggle").addEventListener("change", (e) => setAiMode(e.target.checked));
-  $("btn-ai-key").addEventListener("click",      promptAiKey);
   $("btn-ai-generate").addEventListener("click", aiGenerate);
   $("btn-ai-accept").addEventListener("click",   () => guardCUD(acceptAiEntry));
   $("btn-ai-edit").addEventListener("click",     editAiEntry);
   $("btn-ai-cancel").addEventListener("click",   resetAiPreview);
+  $("btn-ai-mismatch-yes").addEventListener("click", confirmAiMismatch);
+  $("btn-ai-mismatch-no").addEventListener("click",  declineAiMismatch);
+
+  // AI key editor (in-modal)
+  $("btn-ai-key").addEventListener("click",        () => toggleAiKeyEditor());
+  $("btn-ai-key-save").addEventListener("click",   saveAiKeyFromInput);
+  $("btn-ai-key-remove").addEventListener("click", removeAiKey);
+  $("btn-ai-key-cancel").addEventListener("click", () => toggleAiKeyEditor(false));
 
   // Group modal
   $("btn-group-save").addEventListener("click",   () => guardCUD(saveGroup));
@@ -386,6 +393,7 @@ function init() {
       else closeSearch();
     }
     if (e.key === "Enter" && !$("modal-overlay").classList.contains("hidden")) {
+      if (document.activeElement === $("ai-key-input")) { saveAiKeyFromInput(); return; }
       if (state.aiMode) {
         if (document.activeElement === $("ai-word")) aiGenerate();
         return;
