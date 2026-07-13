@@ -108,13 +108,44 @@ const AI_SCHEMAS = {
   },
 };
 
+// Wrapper: the model reports the word's ACTUAL class and builds that entry,
+// so a word typed under the wrong type still comes back usable in one call.
+const AI_WRAPPER_SCHEMA = {
+  type: "object",
+  properties: {
+    type: {
+      type: "string",
+      enum: Object.keys(AI_SCHEMAS),
+      description: "The actual word class of the generated entry",
+    },
+    entry: { anyOf: Object.values(AI_SCHEMAS) },
+  },
+  required: ["type", "entry"],
+  additionalProperties: false,
+};
+
 const AI_SYSTEM_PROMPT =
   "You are a German dictionary assistant for an A1–B2 vocabulary flashcard app. " +
-  "Given a German word and its word class, return its dictionary entry data. " +
+  "The user selects a word class and types a German word; return its dictionary entry data. " +
+  "If the word genuinely belongs to the selected class, set type to the selected class and build that entry — " +
+  "when a word exists in multiple classes, prefer the selected one. " +
+  "Remember that most German adjectives also work as adverbs (schnell, gut, langsam …): " +
+  "if the user selects adverb for such a word, build the adverb entry — do not switch to adjective. " +
+  "Only if the word does NOT exist in the selected class, set type to its actual word class " +
+  "and build the entry for that class instead. " +
   "Use correct German spelling and capitalization (nouns capitalized, verbs lowercase). " +
   "If the input looks misspelled, correct it to the most likely intended word. " +
+  "The entry must be internally consistent with the returned type: " +
+  "a verb entry's name is a lowercase infinitive, a noun entry's name is a capitalized singular. " +
+  "If a typo's most likely correction is a word of a different class, return that class. " +
   "Keep meanings short and learner-friendly: eng in English, ind in Indonesian. " +
-  "For verbs, give Präsens and Präteritum forms for all six persons and the bare Partizip II.";
+  "For verbs, give Präsens and Präteritum forms for all six persons and the bare Partizip II. " +
+  "If a noun is singular-only (e.g. Milch, Obst) or plural-only (e.g. Eltern, Leute), " +
+  "append the marker to BOTH the name and plural fields, using the same word in both: " +
+  'singular-only → name: "Milch (Singular)", plural: "Milch (Singular)"; ' +
+  'plural-only → name: "Eltern (Plural)", plural: "Eltern (Plural)". ' +
+  "Normal nouns with both forms get no marker. " +
+  'For plural-only nouns always use gender "feminin" so the card shows the article "die".';
 
 // ── API Call ──────────────────────────────────────────────────────────────────
 
@@ -135,9 +166,9 @@ async function generateAiEntry(type, word) {
       model: AI_MODEL,
       max_tokens: 2048,
       system: AI_SYSTEM_PROMPT,
-      output_config: { format: { type: "json_schema", schema: AI_SCHEMAS[type] } },
+      output_config: { format: { type: "json_schema", schema: AI_WRAPPER_SCHEMA } },
       messages: [
-        { role: "user", content: `Create the ${type} entry for: "${word}"` },
+        { role: "user", content: `Selected word class: ${type}. Word: "${word}"` },
       ],
     }),
   });
@@ -156,7 +187,7 @@ async function generateAiEntry(type, word) {
   if (data.stop_reason === "refusal") throw new Error("The model declined this request.");
   const text = (data.content || []).find((b) => b.type === "text")?.text;
   if (!text) throw new Error("Empty response from the API.");
-  return JSON.parse(text);
+  return JSON.parse(text); // { type, entry }
 }
 
 // ── AI Mode Switch ────────────────────────────────────────────────────────────
@@ -189,9 +220,24 @@ async function aiGenerate() {
   setText("btn-ai-generate", "Generating…");
   setText("ai-error", "");
   try {
-    const entry = await generateAiEntry(state.modalType, word);
-    aiPendingEntry = { type: state.modalType, entry };
-    renderAiPreview(state.modalType, entry);
+    const result = await generateAiEntry(state.modalType, word);
+    const entry = result.entry;
+    const type = AI_SCHEMAS[result.type] ? result.type : state.modalType;
+
+    // Word exists as a different class than selected — confirm before switching
+    if (type !== state.modalType) {
+      const ok = window.confirm(
+        `"${word}" doesn't seem to be a ${state.modalType}.\nDo you mean ${entry.name} (${type})?`
+      );
+      if (!ok) {
+        setText("ai-error", "Not added — try another word or type.");
+        return;
+      }
+      switchModalType(type); // updates state.modalType + active type buttons
+    }
+
+    aiPendingEntry = { type, entry };
+    renderAiPreview(type, entry);
     hide("ai-input-row");
     show("ai-preview");
     $("btn-ai-accept").focus();
