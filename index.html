@@ -1,387 +1,575 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>German Cards</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <!-- ── Single Study Screen ───────────────────────────────── -->
-  <div id="view-study" class="view active">
-
-    <header>
-      <!-- Group title strip (navy, shown only in group study mode) -->
-      <div id="group-title-bar" class="hidden">
-        <span id="group-mode-label"></span>
-      </div>
-
-      <!-- Main nav row -->
-      <div class="header-nav">
-        <!-- Back button (group mode) -->
-        <button class="hidden" id="btn-back-groups" title="Back to Groups">‹</button>
-
-        <!-- Search -->
-        <div class="search-wrap" id="search-wrap">
-          <input type="text" id="search-input" placeholder="Search anything…" autocomplete="off" spellcheck="false">
-          <div class="search-dropdown hidden" id="search-dropdown"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>German Cards</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ── Single Study Screen ───────────────────────────────── -->
+    <div id="view-study" class="view active">
+      <header>
+        <!-- Group title strip (navy, shown only in group study mode) -->
+        <div id="group-title-bar" class="hidden">
+          <span id="group-mode-label"></span>
         </div>
 
-        <!-- Hamburger (mobile only) -->
-        <button class="header-btn hamburger-btn" id="btn-hamburger" aria-label="Menu">☰</button>
+        <!-- Main nav row -->
+        <div class="header-nav">
+          <!-- Back button (group mode) -->
+          <button class="hidden" id="btn-back-groups" title="Back to Groups">
+            ‹
+          </button>
 
-        <!-- Right side controls -->
-        <div class="header-right">
-          <!-- Deck cycle button + dropdown -->
-          <div class="deck-switcher" id="deck-switcher">
-            <button class="deck-cycle-btn" id="deck-cycle-btn">Nouns</button>
-            <div class="deck-dropdown hidden" id="deck-dropdown">
-              <button class="deck-drop-opt" data-deck="nouns">Nouns</button>
-              <button class="deck-drop-opt" data-deck="verbs">Verbs</button>
-              <button class="deck-drop-opt" data-deck="adjectives">Adjectives</button>
-              <button class="deck-drop-opt" data-deck="adverbs">Adverbs</button>
-              <button class="deck-drop-opt" data-deck="prepositions">Prepositions</button>
+          <!-- Search -->
+          <div class="search-wrap" id="search-wrap">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search anything…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <div class="search-dropdown hidden" id="search-dropdown"></div>
+          </div>
+
+          <!-- Hamburger (mobile only) -->
+          <button
+            class="header-btn hamburger-btn"
+            id="btn-hamburger"
+            aria-label="Menu"
+          >
+            ☰
+          </button>
+
+          <!-- Right side controls -->
+          <div class="header-right">
+            <!-- Deck cycle button + dropdown -->
+            <div class="deck-switcher" id="deck-switcher">
+              <button class="deck-cycle-btn" id="deck-cycle-btn">Nouns</button>
+              <div class="deck-dropdown hidden" id="deck-dropdown">
+                <button class="deck-drop-opt" data-deck="nouns">Nouns</button>
+                <button class="deck-drop-opt" data-deck="verbs">Verbs</button>
+                <button class="deck-drop-opt" data-deck="adjectives">
+                  Adjectives
+                </button>
+                <button class="deck-drop-opt" data-deck="adverbs">
+                  Adverbs
+                </button>
+                <button class="deck-drop-opt" data-deck="prepositions">
+                  Prepositions
+                </button>
+              </div>
+            </div>
+            <span id="card-counter"></span>
+            <div class="shuffle-ctrl">
+              <button id="shuffle-btn" class="shuffle-btn">Shuffle</button>
+              <button
+                id="shuffle-off"
+                class="shuffle-off hidden"
+                title="Disable shuffle"
+              >
+                ✕
+              </button>
+            </div>
+            <button class="header-btn primary" id="btn-add" title="Add card">
+              +
+            </button>
+            <button
+              class="header-btn"
+              id="btn-bulk-add"
+              title="Bulk add vocab via JSON"
+            >
+              { }
+            </button>
+            <button
+              class="header-btn"
+              id="btn-export"
+              title="Export to vocab.txt"
+            >
+              ↓
+            </button>
+            <button class="header-btn" id="btn-groups" title="Groups">
+              Groups
+            </button>
+            <div class="mode-switcher" id="mode-switcher">
+              <button class="header-btn mode-cycle-btn" id="mode-cycle-btn">
+                Mode
+              </button>
+              <div class="mode-dropdown hidden" id="mode-dropdown">
+                <a class="mode-drop-opt" href="vocabgendertraining/index.html"
+                  >Gender</a
+                >
+                <a class="mode-drop-opt" href="flipped/index.html">Flipped</a>
+              </div>
             </div>
           </div>
-          <span id="card-counter"></span>
-          <div class="shuffle-ctrl">
-            <button id="shuffle-btn" class="shuffle-btn">Shuffle</button>
-            <button id="shuffle-off" class="shuffle-off hidden" title="Disable shuffle">✕</button>
+        </div>
+      </header>
+
+      <!-- Card area (hidden when summary shows) -->
+      <div id="study-content" class="study-main">
+        <div class="card-scene">
+          <div class="card-inner" id="card-inner">
+            <div class="card-front" id="card-front"></div>
+            <div class="card-back" id="card-back"></div>
           </div>
-          <button class="header-btn primary" id="btn-add" title="Add card">+</button>
-          <button class="header-btn" id="btn-bulk-add" title="Bulk add vocab via JSON">{ }</button>
-          <button class="header-btn" id="btn-export" title="Export to vocab.txt">↓</button>
-          <button class="header-btn" id="btn-groups" title="Groups">Groups</button>
-          <div class="mode-switcher" id="mode-switcher">
-            <button class="header-btn mode-cycle-btn" id="mode-cycle-btn">Mode</button>
-            <div class="mode-dropdown hidden" id="mode-dropdown">
-              <a class="mode-drop-opt" href="vocabgendertraining/index.html">Gender</a>
-              <a class="mode-drop-opt" href="flipped/index.html">Flipped</a>
+        </div>
+
+        <!-- Edit / Delete row (fixed height slot) -->
+        <div class="card-actions-row">
+          <div class="card-actions" id="card-actions">
+            <button id="btn-edit-card">✏️ Edit</button>
+            <button id="btn-delete-card">🗑️ Delete</button>
+          </div>
+          <div id="delete-confirm" class="hidden">
+            <span id="delete-confirm-text">Delete this card?</span>
+            <button id="btn-confirm-delete">Yes</button>
+            <button id="btn-cancel-delete">No</button>
+          </div>
+        </div>
+
+        <!-- Prev / Knew / Didn't / Next -->
+        <div class="study-nav">
+          <button id="btn-prev">← Prev</button>
+          <div class="knew-buttons">
+            <button id="btn-knew">✓ Knew it</button>
+            <button id="btn-didnt">✗ Didn't</button>
+          </div>
+          <button id="btn-next">Next →</button>
+        </div>
+
+        <!-- Score line + reset -->
+        <div id="score-line">
+          <span id="score-knew">✓ 0</span>
+          <span id="score-didnt">✗ 0</span>
+          <span id="score-total"></span>
+          <button id="btn-reset" title="Reset progress">↺ Reset</button>
+        </div>
+
+        <!-- Combine both decks -->
+        <button id="btn-combine">🔀 Combine Cards</button>
+
+        <!-- Revision mode banner -->
+        <div id="revision-banner" class="hidden">
+          Revision mode active &nbsp;·&nbsp;
+          <button id="btn-clear-revision">Refill all cards</button>
+        </div>
+      </div>
+
+      <!-- Session summary -->
+      <div class="summary-wrap hidden" id="summary-wrap">
+        <div id="session-summary">
+          <h2>Session complete!</h2>
+          <p id="summary-text"></p>
+          <div id="summary-missed-list"></div>
+          <div class="summary-buttons">
+            <button id="btn-restart">Restart deck</button>
+            <button id="btn-retry-missed" class="hidden">↺ Retry missed</button>
+            <button id="btn-refill-deck" class="hidden">
+              Refill all cards
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Groups Screen ─────────────────────────────────────── -->
+    <div id="view-groups" class="view">
+      <header>
+        <button class="header-btn" id="btn-back-library">← Library</button>
+        <h1 class="groups-title">Groups</h1>
+        <button class="header-btn primary" id="btn-new-group">
+          + New Group
+        </button>
+      </header>
+      <div id="groups-list" class="groups-list"></div>
+    </div>
+
+    <!-- ── Add / Edit Card Modal ─────────────────────────────── -->
+    <div id="modal-overlay" class="hidden">
+      <div class="modal">
+        <h2 id="modal-title">Add Card</h2>
+
+        <div class="type-selector">
+          <button class="type-btn active" data-type="verb">Verb</button>
+          <button class="type-btn" data-type="noun">Noun</button>
+          <button class="type-btn" data-type="adjective">Adjective</button>
+          <button class="type-btn" data-type="adverb">Adverb</button>
+          <button class="type-btn" data-type="preposition">Preposition</button>
+        </div>
+
+        <!-- AI mode toggle -->
+        <div class="ai-toggle-row" id="ai-toggle-row">
+          <label class="ai-switch">
+            <input type="checkbox" id="ai-mode-toggle" />
+            <span class="ai-slider"></span>
+          </label>
+          <span class="ai-toggle-label">✨ AI Fill</span>
+          <button id="btn-ai-key" title="Set / change Anthropic API key">
+            🔑
+          </button>
+        </div>
+
+        <!-- AI panel (word input → preview → accept) -->
+        <div id="ai-panel" class="hidden">
+          <div id="ai-input-row">
+            <div class="form-group">
+              <label>Word</label>
+              <input
+                type="text"
+                id="ai-word"
+                placeholder="e.g. gehen"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <button id="btn-ai-generate">✨ Generate</button>
+            <div id="ai-error"></div>
+          </div>
+          <div id="ai-preview" class="hidden">
+            <div id="ai-preview-content"></div>
+            <div class="ai-preview-actions">
+              <button id="btn-ai-accept">✓ Add</button>
+              <button id="btn-ai-edit">✏️ Edit</button>
+              <button id="btn-ai-cancel">Cancel</button>
             </div>
           </div>
         </div>
-      </div>
-    </header>
 
-    <!-- Card area (hidden when summary shows) -->
-    <div id="study-content" class="study-main">
-      <div class="card-scene">
-        <div class="card-inner" id="card-inner">
-          <div class="card-front" id="card-front"></div>
-          <div class="card-back"  id="card-back"></div>
+        <!-- Verb Form -->
+        <div id="verb-form">
+          <div class="form-group">
+            <label>Infinitiv</label>
+            <input type="text" id="verb-name" placeholder="e.g. gehen" />
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="verb-type">
+              <option value="regular">Regular</option>
+              <option value="irregular">Irregular</option>
+            </select>
+          </div>
+          <label
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              color: #888;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              display: block;
+              margin-bottom: 0.4rem;
+            "
+            >Conjugations</label
+          >
+          <div class="conjugation-grid">
+            <span class="conj-label">ich</span>
+            <input type="text" id="conj-ich" placeholder="gehe" />
+            <span class="conj-label">du</span>
+            <input type="text" id="conj-du" placeholder="gehst" />
+            <span class="conj-label">er/sie/es</span
+            ><input type="text" id="conj-er" placeholder="geht" />
+            <span class="conj-label">wir</span>
+            <input type="text" id="conj-wir" placeholder="gehen" />
+            <span class="conj-label">ihr</span>
+            <input type="text" id="conj-ihr" placeholder="geht" />
+            <span class="conj-label">Sie</span>
+            <input type="text" id="conj-sie" placeholder="gehen" />
+          </div>
+          <label
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              color: #888;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              display: block;
+              margin-top: 0.75rem;
+              margin-bottom: 0.4rem;
+            "
+            >Präteritum</label
+          >
+          <div class="conjugation-grid">
+            <span class="conj-label">ich</span>
+            <input type="text" id="prae-ich" placeholder="ging" />
+            <span class="conj-label">du</span>
+            <input type="text" id="prae-du" placeholder="gingst" />
+            <span class="conj-label">er/sie/es</span>
+            <input type="text" id="prae-er" placeholder="ging" />
+            <span class="conj-label">wir</span>
+            <input type="text" id="prae-wir" placeholder="gingen" />
+            <span class="conj-label">ihr</span>
+            <input type="text" id="prae-ihr" placeholder="gingt" />
+            <span class="conj-label">Sie</span>
+            <input type="text" id="prae-sie" placeholder="gingen" />
+          </div>
+          <label
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              color: #888;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              display: block;
+              margin-top: 0.75rem;
+              margin-bottom: 0.4rem;
+            "
+            >Partizip II</label
+          >
+          <div class="form-group">
+            <input
+              type="text"
+              id="verb-partizip2"
+              placeholder="e.g. gegangen"
+            />
+          </div>
+          <div class="form-group">
+            <label>Meaning (English)</label>
+            <input type="text" id="verb-eng" placeholder="to go" />
+          </div>
+          <div class="form-group">
+            <label>Meaning (Indonesian)</label>
+            <input type="text" id="verb-ind" placeholder="pergi" />
+          </div>
         </div>
-      </div>
 
-      <!-- Edit / Delete row (fixed height slot) -->
-      <div class="card-actions-row">
-        <div class="card-actions" id="card-actions">
-          <button id="btn-edit-card">✏️ Edit</button>
-          <button id="btn-delete-card">🗑️ Delete</button>
+        <!-- Noun Form -->
+        <div id="noun-form" class="hidden">
+          <div class="form-group">
+            <label>Nomen</label>
+            <input type="text" id="noun-name" placeholder="e.g. Hund" />
+          </div>
+          <div class="form-group">
+            <label>Plural</label>
+            <input type="text" id="noun-plural" placeholder="e.g. Hunde" />
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="noun-gender">
+              <option value="maskulin">Maskulin (der)</option>
+              <option value="feminin">Feminin (die)</option>
+              <option value="netral">Netral (das)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Meaning (English)</label>
+            <input type="text" id="noun-eng" placeholder="dog" />
+          </div>
+          <div class="form-group">
+            <label>Meaning (Indonesian)</label>
+            <input type="text" id="noun-ind" placeholder="anjing" />
+          </div>
         </div>
-        <div id="delete-confirm" class="hidden">
-          <span id="delete-confirm-text">Delete this card?</span>
-          <button id="btn-confirm-delete">Yes</button>
-          <button id="btn-cancel-delete">No</button>
+
+        <!-- Adverb Form -->
+        <div id="adverb-form" class="hidden">
+          <div class="form-group">
+            <label>Adverb</label>
+            <input type="text" id="adv-name" placeholder="e.g. schnell" />
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="adv-type">
+              <option value="modal">Modal (how)</option>
+              <option value="temporal">Temporal (when)</option>
+              <option value="lokal">Lokal (where)</option>
+              <option value="kausal">Kausal (why)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Meaning (English)</label>
+            <input type="text" id="adv-eng" placeholder="quickly" />
+          </div>
+          <div class="form-group">
+            <label>Meaning (Indonesian)</label>
+            <input type="text" id="adv-ind" placeholder="dengan cepat" />
+          </div>
         </div>
-      </div>
 
-      <!-- Prev / Knew / Didn't / Next -->
-      <div class="study-nav">
-        <button id="btn-prev">← Prev</button>
-        <div class="knew-buttons">
-          <button id="btn-knew">✓ Knew it</button>
-          <button id="btn-didnt">✗ Didn't</button>
+        <!-- Preposition Form -->
+        <div id="preposition-form" class="hidden">
+          <div class="form-group">
+            <label>Präposition</label>
+            <input type="text" id="prep-name" placeholder="e.g. bei" />
+          </div>
+          <div class="form-group">
+            <label>Case</label>
+            <select id="prep-case">
+              <option value="dativ">Dativ</option>
+              <option value="akkusativ">Akkusativ</option>
+              <option value="dativ/akkusativ">Dativ / Akkusativ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Meaning (English)</label>
+            <input type="text" id="prep-eng" placeholder="at / near / with" />
+          </div>
+          <div class="form-group">
+            <label>Meaning (Indonesian)</label>
+            <input
+              type="text"
+              id="prep-ind"
+              placeholder="di / dekat / dengan"
+            />
+          </div>
         </div>
-        <button id="btn-next">Next →</button>
-      </div>
 
-      <!-- Score line + reset -->
-      <div id="score-line">
-        <span id="score-knew">✓ 0</span>
-        <span id="score-didnt">✗ 0</span>
-        <span id="score-total"></span>
-        <button id="btn-reset" title="Reset progress">↺ Reset</button>
-      </div>
+        <!-- Adjective Form -->
+        <div id="adjective-form" class="hidden">
+          <div class="form-group">
+            <label>Grundform</label>
+            <input type="text" id="adj-name" placeholder="e.g. schnell" />
+          </div>
+          <div class="form-group">
+            <label>Komparativ</label>
+            <input
+              type="text"
+              id="adj-comparative"
+              placeholder="e.g. schneller"
+            />
+          </div>
+          <div class="form-group">
+            <label>Superlativ</label>
+            <input
+              type="text"
+              id="adj-superlative"
+              placeholder="e.g. am schnellsten"
+            />
+          </div>
+          <div class="form-group">
+            <label>Meaning (English)</label>
+            <input type="text" id="adj-eng" placeholder="fast" />
+          </div>
+          <div class="form-group">
+            <label>Meaning (Indonesian)</label>
+            <input type="text" id="adj-ind" placeholder="cepat" />
+          </div>
+        </div>
 
-      <!-- Combine both decks -->
-      <button id="btn-combine">🔀 Combine Cards</button>
-
-      <!-- Revision mode banner -->
-      <div id="revision-banner" class="hidden">
-        Revision mode active &nbsp;·&nbsp;
-        <button id="btn-clear-revision">Refill all cards</button>
+        <div class="modal-actions">
+          <button id="btn-modal-save">Save</button>
+          <button id="btn-modal-cancel">Cancel</button>
+        </div>
       </div>
     </div>
 
-    <!-- Session summary -->
-    <div class="summary-wrap hidden" id="summary-wrap">
-      <div id="session-summary">
-        <h2>Session complete!</h2>
-        <p id="summary-text"></p>
-        <div id="summary-missed-list"></div>
-        <div class="summary-buttons">
-          <button id="btn-restart">Restart deck</button>
-          <button id="btn-retry-missed" class="hidden">↺ Retry missed</button>
-          <button id="btn-refill-deck" class="hidden">Refill all cards</button>
+    <!-- ── Group Create / Edit Modal ─────────────────────────── -->
+    <div id="modal-group-overlay" class="hidden">
+      <div class="modal">
+        <h2 id="modal-group-title">New Group</h2>
+
+        <div class="form-group">
+          <label>Group Name</label>
+          <input
+            type="text"
+            id="group-name-input"
+            placeholder="e.g. Week 1 Vocab"
+          />
+        </div>
+
+        <div class="card-picker">
+          <div class="card-picker-header">
+            <span class="picker-label">Cards</span>
+            <input
+              type="text"
+              id="card-picker-search"
+              placeholder="Filter cards…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div id="card-picker-list"></div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="btn-group-save">Save</button>
+          <button id="btn-group-cancel">Cancel</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── Groups Screen ─────────────────────────────────────── -->
-  <div id="view-groups" class="view">
-    <header>
-      <button class="header-btn" id="btn-back-library">← Library</button>
-      <h1 class="groups-title">Groups</h1>
-      <button class="header-btn primary" id="btn-new-group">+ New Group</button>
-    </header>
-    <div id="groups-list" class="groups-list"></div>
-  </div>
-
-  <!-- ── Add / Edit Card Modal ─────────────────────────────── -->
-  <div id="modal-overlay" class="hidden">
-    <div class="modal">
-      <h2 id="modal-title">Add Card</h2>
-
-      <div class="type-selector">
-        <button class="type-btn active" data-type="verb">Verb</button>
-        <button class="type-btn" data-type="noun">Noun</button>
-        <button class="type-btn" data-type="adjective">Adjective</button>
-        <button class="type-btn" data-type="adverb">Adverb</button>
-        <button class="type-btn" data-type="preposition">Preposition</button>
-      </div>
-
-      <!-- Verb Form -->
-      <div id="verb-form">
+    <!-- ── Bulk Add Vocab Modal ─────────────────────────────── -->
+    <div id="modal-bulk-overlay" class="hidden">
+      <div class="modal">
+        <h2>Add Vocab</h2>
         <div class="form-group">
-          <label>Infinitiv</label>
-          <input type="text" id="verb-name" placeholder="e.g. gehen">
-        </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select id="verb-type">
-            <option value="regular">Regular</option>
-            <option value="irregular">Irregular</option>
+          <label>Add Mode</label>
+          <select id="bulk-add-mode">
+            <option value="single">Single Type</option>
+            <option value="combined">Combined (All Types)</option>
           </select>
         </div>
-        <label style="font-size:.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.4rem;">Conjugations</label>
-        <div class="conjugation-grid">
-          <span class="conj-label">ich</span>      <input type="text" id="conj-ich"  placeholder="gehe">
-          <span class="conj-label">du</span>       <input type="text" id="conj-du"   placeholder="gehst">
-          <span class="conj-label">er/sie/es</span><input type="text" id="conj-er"   placeholder="geht">
-          <span class="conj-label">wir</span>      <input type="text" id="conj-wir"  placeholder="gehen">
-          <span class="conj-label">ihr</span>      <input type="text" id="conj-ihr"  placeholder="geht">
-          <span class="conj-label">Sie</span>      <input type="text" id="conj-sie"  placeholder="gehen">
-        </div>
-        <label style="font-size:.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-top:.75rem;margin-bottom:.4rem;">Präteritum</label>
-        <div class="conjugation-grid">
-          <span class="conj-label">ich</span>       <input type="text" id="prae-ich" placeholder="ging">
-          <span class="conj-label">du</span>        <input type="text" id="prae-du"  placeholder="gingst">
-          <span class="conj-label">er/sie/es</span> <input type="text" id="prae-er"  placeholder="ging">
-          <span class="conj-label">wir</span>       <input type="text" id="prae-wir" placeholder="gingen">
-          <span class="conj-label">ihr</span>       <input type="text" id="prae-ihr" placeholder="gingt">
-          <span class="conj-label">Sie</span>       <input type="text" id="prae-sie" placeholder="gingen">
-        </div>
-        <label style="font-size:.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-top:.75rem;margin-bottom:.4rem;">Partizip II</label>
-        <div class="form-group">
-          <input type="text" id="verb-partizip2" placeholder="e.g. gegangen">
-        </div>
-        <div class="form-group">
-          <label>Meaning (English)</label>
-          <input type="text" id="verb-eng" placeholder="to go">
-        </div>
-        <div class="form-group">
-          <label>Meaning (Indonesian)</label>
-          <input type="text" id="verb-ind" placeholder="pergi">
-        </div>
-      </div>
-
-      <!-- Noun Form -->
-      <div id="noun-form" class="hidden">
-        <div class="form-group">
-          <label>Nomen</label>
-          <input type="text" id="noun-name" placeholder="e.g. Hund">
-        </div>
-        <div class="form-group">
-          <label>Plural</label>
-          <input type="text" id="noun-plural" placeholder="e.g. Hunde">
-        </div>
-        <div class="form-group">
-          <label>Gender</label>
-          <select id="noun-gender">
-            <option value="maskulin">Maskulin (der)</option>
-            <option value="feminin">Feminin (die)</option>
-            <option value="netral">Netral (das)</option>
+        <div id="bulk-single-fields" class="form-group">
+          <label>Type of Vocab</label>
+          <select id="bulk-vocab-type">
+            <option value="noun">Noun</option>
+            <option value="verb">Verb</option>
+            <option value="adjective">Adjective</option>
+            <option value="adverb">Adverb</option>
+            <option value="preposition">Preposition</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Meaning (English)</label>
-          <input type="text" id="noun-eng" placeholder="dog">
-        </div>
-        <div class="form-group">
-          <label>Meaning (Indonesian)</label>
-          <input type="text" id="noun-ind" placeholder="anjing">
-        </div>
-      </div>
-
-      <!-- Adverb Form -->
-      <div id="adverb-form" class="hidden">
-        <div class="form-group">
-          <label>Adverb</label>
-          <input type="text" id="adv-name" placeholder="e.g. schnell">
-        </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select id="adv-type">
-            <option value="modal">Modal (how)</option>
-            <option value="temporal">Temporal (when)</option>
-            <option value="lokal">Lokal (where)</option>
-            <option value="kausal">Kausal (why)</option>
+        <div id="bulk-combined-fields" class="form-group hidden">
+          <label>Type of Input</label>
+          <select id="bulk-input-type">
+            <option value="text">Text</option>
+            <option value="file">File Upload</option>
           </select>
+          <input
+            type="file"
+            id="bulk-vocab-file"
+            accept=".txt,.json"
+            class="hidden"
+            style="margin-top: 0.5rem"
+          />
         </div>
         <div class="form-group">
-          <label>Meaning (English)</label>
-          <input type="text" id="adv-eng" placeholder="quickly">
+          <label>Vocab JSON</label>
+          <textarea
+            id="bulk-vocab-json"
+            rows="12"
+            spellcheck="false"
+            style="
+              width: 100%;
+              font-family: monospace;
+              font-size: 0.82rem;
+              padding: 0.5rem;
+              border: 1px solid #ccc;
+              border-radius: 6px;
+              resize: vertical;
+              background: #fafafa;
+            "
+          ></textarea>
         </div>
-        <div class="form-group">
-          <label>Meaning (Indonesian)</label>
-          <input type="text" id="adv-ind" placeholder="dengan cepat">
+        <div
+          id="bulk-vocab-error"
+          style="
+            color: #e53935;
+            font-size: 0.85rem;
+            min-height: 1.2em;
+            margin-bottom: 0.5rem;
+          "
+        ></div>
+        <div class="modal-actions">
+          <button id="btn-bulk-save">Add</button>
+          <button id="btn-bulk-cancel">Cancel</button>
         </div>
-      </div>
-
-      <!-- Preposition Form -->
-      <div id="preposition-form" class="hidden">
-        <div class="form-group">
-          <label>Präposition</label>
-          <input type="text" id="prep-name" placeholder="e.g. bei">
-        </div>
-        <div class="form-group">
-          <label>Case</label>
-          <select id="prep-case">
-            <option value="dativ">Dativ</option>
-            <option value="akkusativ">Akkusativ</option>
-            <option value="dativ/akkusativ">Dativ / Akkusativ</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Meaning (English)</label>
-          <input type="text" id="prep-eng" placeholder="at / near / with">
-        </div>
-        <div class="form-group">
-          <label>Meaning (Indonesian)</label>
-          <input type="text" id="prep-ind" placeholder="di / dekat / dengan">
-        </div>
-      </div>
-
-      <!-- Adjective Form -->
-      <div id="adjective-form" class="hidden">
-        <div class="form-group">
-          <label>Grundform</label>
-          <input type="text" id="adj-name" placeholder="e.g. schnell">
-        </div>
-        <div class="form-group">
-          <label>Komparativ</label>
-          <input type="text" id="adj-comparative" placeholder="e.g. schneller">
-        </div>
-        <div class="form-group">
-          <label>Superlativ</label>
-          <input type="text" id="adj-superlative" placeholder="e.g. am schnellsten">
-        </div>
-        <div class="form-group">
-          <label>Meaning (English)</label>
-          <input type="text" id="adj-eng" placeholder="fast">
-        </div>
-        <div class="form-group">
-          <label>Meaning (Indonesian)</label>
-          <input type="text" id="adj-ind" placeholder="cepat">
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button id="btn-modal-save">Save</button>
-        <button id="btn-modal-cancel">Cancel</button>
       </div>
     </div>
-  </div>
 
-  <!-- ── Group Create / Edit Modal ─────────────────────────── -->
-  <div id="modal-group-overlay" class="hidden">
-    <div class="modal">
-      <h2 id="modal-group-title">New Group</h2>
+    <!-- ── Logout (fixed, bottom-right, admin only) ─────────── -->
+    <button id="btn-logout" class="logout-fab hidden">Logout</button>
 
-      <div class="form-group">
-        <label>Group Name</label>
-        <input type="text" id="group-name-input" placeholder="e.g. Week 1 Vocab">
-      </div>
-
-      <div class="card-picker">
-        <div class="card-picker-header">
-          <span class="picker-label">Cards</span>
-          <input type="text" id="card-picker-search" placeholder="Filter cards…" autocomplete="off" spellcheck="false">
-        </div>
-        <div id="card-picker-list"></div>
-      </div>
-
-      <div class="modal-actions">
-        <button id="btn-group-save">Save</button>
-        <button id="btn-group-cancel">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Bulk Add Vocab Modal ─────────────────────────────── -->
-  <div id="modal-bulk-overlay" class="hidden">
-    <div class="modal">
-      <h2>Add Vocab</h2>
-      <div class="form-group">
-        <label>Add Mode</label>
-        <select id="bulk-add-mode">
-          <option value="single">Single Type</option>
-          <option value="combined">Combined (All Types)</option>
-        </select>
-      </div>
-      <div id="bulk-single-fields" class="form-group">
-        <label>Type of Vocab</label>
-        <select id="bulk-vocab-type">
-          <option value="noun">Noun</option>
-          <option value="verb">Verb</option>
-          <option value="adjective">Adjective</option>
-          <option value="adverb">Adverb</option>
-          <option value="preposition">Preposition</option>
-        </select>
-      </div>
-      <div id="bulk-combined-fields" class="form-group hidden">
-        <label>Type of Input</label>
-        <select id="bulk-input-type">
-          <option value="text">Text</option>
-          <option value="file">File Upload</option>
-        </select>
-        <input type="file" id="bulk-vocab-file" accept=".txt,.json" class="hidden" style="margin-top:.5rem;">
-      </div>
-      <div class="form-group">
-        <label>Vocab JSON</label>
-        <textarea id="bulk-vocab-json" rows="12" spellcheck="false" style="width:100%;font-family:monospace;font-size:.82rem;padding:.5rem;border:1px solid #ccc;border-radius:6px;resize:vertical;background:#fafafa;"></textarea>
-      </div>
-      <div id="bulk-vocab-error" style="color:#e53935;font-size:.85rem;min-height:1.2em;margin-bottom:.5rem;"></div>
-      <div class="modal-actions">
-        <button id="btn-bulk-save">Add</button>
-        <button id="btn-bulk-cancel">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Logout (fixed, bottom-right, admin only) ─────────── -->
-  <button id="btn-logout" class="logout-fab hidden">Logout</button>
-
-  <script src="domhandler.js"></script>
-  <script src="data.js"></script>
-  <script src="render.js"></script>
-  <script src="search.js"></script>
-  <script src="groups.js"></script>
-  <script src="modal.js"></script>
-  <script src="auth.js"></script>
-  <script src="app.js"></script>
-</body>
+    <script src="domhandler.js"></script>
+    <script src="data.js"></script>
+    <script src="render.js"></script>
+    <script src="search.js"></script>
+    <script src="groups.js"></script>
+    <script src="modal.js"></script>
+    <script src="ai.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>

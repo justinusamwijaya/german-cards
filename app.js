@@ -12,6 +12,7 @@ let state = {
   viewMode:      "library",   // 'library' | 'group-study'
   activeGroupId: null,
   shuffleEnabled: false,
+  aiMode:        false,
 };
 
 // ── Deck constants ────────────────────────────────────────────────────────────
@@ -357,6 +358,14 @@ function init() {
     if (e.target === $("modal-overlay")) closeModal();
   });
 
+  // AI mode (switch → generate → preview → accept)
+  $("ai-mode-toggle").addEventListener("change", (e) => setAiMode(e.target.checked));
+  $("btn-ai-key").addEventListener("click",      promptAiKey);
+  $("btn-ai-generate").addEventListener("click", aiGenerate);
+  $("btn-ai-accept").addEventListener("click",   () => guardCUD(acceptAiEntry));
+  $("btn-ai-edit").addEventListener("click",     editAiEntry);
+  $("btn-ai-cancel").addEventListener("click",   resetAiPreview);
+
   // Group modal
   $("btn-group-save").addEventListener("click",   () => guardCUD(saveGroup));
   $("btn-group-cancel").addEventListener("click", closeGroupModal);
@@ -377,6 +386,10 @@ function init() {
       else closeSearch();
     }
     if (e.key === "Enter" && !$("modal-overlay").classList.contains("hidden")) {
+      if (state.aiMode) {
+        if (document.activeElement === $("ai-word")) aiGenerate();
+        return;
+      }
       if (document.activeElement.tagName !== "SELECT") {
         if (e.shiftKey) { const type = state.modalType; saveCard(); openModal(type); }
         else saveCard();

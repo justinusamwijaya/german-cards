@@ -11,6 +11,10 @@ function openModal(type, card = null) {
     btn.disabled = !!card;
   });
 
+  // AI mode: only offered when adding, never when editing
+  setVisible("ai-toggle-row", !card);
+  setAiMode(false);
+
   switchModalType(type);
   clearModal();
 
@@ -67,15 +71,18 @@ function clearModal() {
   $("noun-gender").value = "maskulin";
   $("adv-type").value   = "modal";
   $("prep-case").value  = "dativ";
+  $("ai-word").value    = "";
+  resetAiPreview();
 }
 
 function switchModalType(type) {
   state.modalType = type;
-  setVisible("verb-form",        type === "verb");
-  setVisible("noun-form",        type === "noun");
-  setVisible("adjective-form",   type === "adjective");
-  setVisible("adverb-form",      type === "adverb");
-  setVisible("preposition-form", type === "preposition");
+  const manual = !state.aiMode; // in AI mode the detail forms stay hidden
+  setVisible("verb-form",        manual && type === "verb");
+  setVisible("noun-form",        manual && type === "noun");
+  setVisible("adjective-form",   manual && type === "adjective");
+  setVisible("adverb-form",      manual && type === "adverb");
+  setVisible("preposition-form", manual && type === "preposition");
   document.querySelectorAll(".type-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
