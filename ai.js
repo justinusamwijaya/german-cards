@@ -3,7 +3,7 @@
 // runtime and lives only in this browser's localStorage.
 
 const AI_KEY_STORAGE = "gc_anthropic_key";
-const AI_MODEL = "claude-opus-4-8";
+const AI_MODEL = "claude-haiku-4-5"; // cheap + accurate for vocab lookups; use "claude-opus-4-8" if quality ever slips
 
 const AI_DECK_KEYS = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs", preposition: "prepositions" };
 
