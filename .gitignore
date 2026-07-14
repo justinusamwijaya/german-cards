@@ -1,4 +1,5 @@
 server.js
 vocab.txt
+clean-vocab.js
 oldvocab.txt
 api-key.txt

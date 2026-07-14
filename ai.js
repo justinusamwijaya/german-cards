@@ -70,12 +70,14 @@ const AI_SCHEMAS = {
     properties: {
       name: { type: "string", description: "Infinitive, correctly spelled" },
       type: { type: "string", enum: ["regular", "irregular"] },
+      reflexive: { type: "boolean", description: "True if the verb is primarily used reflexively (sich freuen)" },
+      trennbar: { type: "boolean", description: "True if the verb has a separable prefix (anrufen -> ich rufe an)" },
       conjugations: aiPersonTable("Präsens conjugation"),
       praeteritum: aiPersonTable("Präteritum conjugation"),
       partizip2: { type: "string", description: "Partizip II, bare participle only, e.g. gegangen" },
       meaning: AI_MEANING_SCHEMA,
     },
-    required: ["name", "type", "conjugations", "praeteritum", "partizip2", "meaning"],
+    required: ["name", "type", "reflexive", "trennbar", "conjugations", "praeteritum", "partizip2", "meaning"],
     additionalProperties: false,
   },
   noun: {
@@ -83,7 +85,7 @@ const AI_SCHEMAS = {
     properties: {
       name: { type: "string", description: "Singular noun, capitalized, without article" },
       plural: { type: "string", description: "Plural form without article" },
-      gender: { type: "string", enum: ["maskulin", "feminin", "netral"] },
+      gender: { type: "string", enum: ["maskulin", "feminin", "netral", "kein"] },
       meaning: AI_MEANING_SCHEMA,
     },
     required: ["name", "plural", "gender", "meaning"],
@@ -154,12 +156,17 @@ const AI_SYSTEM_PROMPT =
   "If a typo's most likely correction is a word of a different class, return that class. " +
   "Keep meanings short and learner-friendly: eng in English, ind in Indonesian. " +
   "For verbs, give Präsens and Präteritum forms for all six persons and the bare Partizip II. " +
+  "Set reflexive true only for verbs primarily used with a reflexive pronoun (sich freuen, sich beeilen); " +
+  "keep the name as the bare infinitive without sich, but include the pronoun in the conjugated forms (ich freue mich). " +
+  "Set trennbar true for separable-prefix verbs (anrufen, einkaufen) and conjugate them with the prefix separated (ich rufe an). " +
   "If a noun is singular-only (e.g. Milch, Obst) or plural-only (e.g. Eltern, Leute), " +
   "append the marker to BOTH the name and plural fields, using the same word in both: " +
   'singular-only → name: "Milch (Singular)", plural: "Milch (Singular)"; ' +
   'plural-only → name: "Eltern (Plural)", plural: "Eltern (Plural)". ' +
   "Normal nouns with both forms get no marker. " +
-  'For plural-only nouns always use gender "feminin" so the card shows the article "die".';
+  'For plural-only nouns always use gender "feminin" so the card shows the article "die". ' +
+  'Use gender "kein" for nouns used without an article (most countries and cities like Deutschland, ' +
+  "languages like Deutsch, and school subjects like Mathematik).";
 
 // ── API Call ──────────────────────────────────────────────────────────────────
 
@@ -273,10 +280,14 @@ function renderAiPreview(type, entry) {
 
   let title = e(entry.name);
   let badge = "";
+  let extraBadges = "";
   let details = "";
 
   if (type === "verb") {
     badge = e(entry.type || "");
+    extraBadges =
+      (entry.reflexive ? '<span class="ai-badge">reflexiv</span>' : "") +
+      (entry.trennbar  ? '<span class="ai-badge">trennbar</span>'  : "");
     const rows = CONJ_KEYS.map((k) =>
       `<tr><td class="ai-person">${e(k)}</td><td>${e(entry.conjugations?.[k] || "")}</td><td>${e(entry.praeteritum?.[k] || "")}</td></tr>`
     ).join("");
@@ -288,9 +299,9 @@ function renderAiPreview(type, entry) {
       <div class="ai-detail-line">Partizip II: <b>${e(entry.partizip2 || "")}</b></div>`;
   } else if (type === "noun") {
     const article = ARTICLES[entry.gender] || "";
-    title = `${e(article)} ${e(entry.name)}`;
-    badge = e(entry.gender || "");
-    details = `<div class="ai-detail-line">Plural: <b>die ${e(entry.plural || "")}</b></div>`;
+    title = `${article ? e(article) + " " : ""}${e(entry.name)}`;
+    badge = entry.gender === "kein" ? "kein Artikel" : e(entry.gender || "");
+    details = `<div class="ai-detail-line">Plural: <b>${entry.plural ? "die " + e(entry.plural) : "—"}</b></div>`;
   } else if (type === "adjective") {
     details = `
       <div class="ai-detail-line">Komparativ: <b>${e(entry.comparative || "")}</b></div>
@@ -303,7 +314,7 @@ function renderAiPreview(type, entry) {
 
   $("ai-preview-content").innerHTML = `
     <div class="ai-question">Add <b>${title}</b> — ${meanings}?</div>
-    ${badge ? `<span class="ai-badge">${badge}</span>` : ""}
+    ${badge ? `<span class="ai-badge">${badge}</span>` : ""}${extraBadges}
     ${details}`;
 }
 
@@ -332,6 +343,11 @@ function acceptAiEntry() {
   const data = loadData();
   const deckKey = AI_DECK_KEYS[type];
   const card = { id: genId(), ...entry };
+  // normal verbs carry no flags at all (matches manual-form and clean-vocab.js schema)
+  if (type === "verb") {
+    if (!card.reflexive) delete card.reflexive;
+    if (!card.trennbar)  delete card.trennbar;
+  }
   data[deckKey].push(card);
 
   // Auto-add to active group when adding during group-study (mirrors saveCard)
@@ -364,6 +380,8 @@ function fillModalFromAiEntry(type, entry) {
   if (type === "verb") {
     $("verb-name").value = entry.name || "";
     $("verb-type").value = entry.type || "regular";
+    $("verb-reflexive").checked = !!entry.reflexive;
+    $("verb-trennbar").checked  = !!entry.trennbar;
     CONJ_KEYS.forEach((key, i) => { $(CONJ_IDS[i]).value = (entry.conjugations && entry.conjugations[key]) || ""; });
     CONJ_KEYS.forEach((key, i) => { $(PRAE_IDS[i]).value = (entry.praeteritum && entry.praeteritum[key]) || ""; });
     $("verb-partizip2").value = entry.partizip2 || "";

@@ -97,7 +97,7 @@ function renderCardPicker(query) {
     ...(data.prepositions || []).map((c) => ({ ...c, _type: "preposition" })),
   ].filter((c) => {
     if (!q) return true;
-    const prefix = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
+    const prefix = c._type === "noun" && nounArticle(c) ? nounArticle(c) + " " : "";
     return (
       normalizeSearch(prefix + c.name).includes(q) ||
       normalizeSearch(c.meaning.eng).includes(q) ||
@@ -115,7 +115,7 @@ function renderCardPicker(query) {
     const sel       = _groupSelectedIds.has(c.id);
     const badgeCls  = c._type === "noun" ? "noun-badge" : c._type === "adjective" ? "adj-badge" : c._type === "adverb" ? "adv-badge" : c._type === "preposition" ? "prep-badge" : "verb-badge";
     const typeLabel = c._type === "noun" ? "Noun"       : c._type === "adjective" ? "Adj"       : c._type === "adverb" ? "Adv"       : c._type === "preposition" ? "Prep"        : "Verb";
-    const prefix    = c._type === "noun" ? (ARTICLES[c.gender] || "") + " " : "";
+    const prefix    = c._type === "noun" && nounArticle(c) ? nounArticle(c) + " " : "";
     return `<div class="picker-item${sel ? " selected" : ""}" data-id="${c.id}">
       <span class="badge ${badgeCls}">${typeLabel}</span>
       <span class="picker-name">${escapeHtml(prefix + c.name)}</span>

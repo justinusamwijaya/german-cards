@@ -475,11 +475,25 @@ body {
   background: #e6f4ea;
   color: #1a7a3c;
 }
+.gender-none {
+  background: #ececec;
+  color: #555;
+}
+.reflexive-badge {
+  background: #f3e8ff;
+  color: #6b1a9e;
+}
+.trennbar-badge {
+  background: #fff3e0;
+  color: #b85c00;
+}
 
 .badge-row {
   display: flex;
   gap: 0.4rem;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* ── Card Front ───────────────────────────────────────────────── */
@@ -1028,6 +1042,25 @@ body {
 .form-group input:focus,
 .form-group select:focus {
   border-color: #1a3c5e;
+}
+
+.verb-flags-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.verb-flags-row .verb-flag-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.verb-flags-row input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  accent-color: #1a3c5e;
 }
 
 .conjugation-grid {

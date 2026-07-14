@@ -13,7 +13,13 @@ const ARTICLES = {
   feminin: "die",
   netral: "das",
   neutrum: "das",
+  kein: "",
 };
+
+// Resolves a noun's article; "" for article-less nouns (gender "kein")
+function nounArticle(noun) {
+  return noun.gender === "kein" ? "" : ARTICLES[noun.gender] || "der";
+}
 
 const CONJ_KEYS = ["ich", "du", "er/sie/es", "wir", "ihr", "Sie"];
 const CONJ_IDS = [

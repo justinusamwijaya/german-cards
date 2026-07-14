@@ -1,4 +1,4 @@
-const ARTICLES      = { maskulin: 'der', feminin: 'die', netral: 'das' };
+const ARTICLES      = { maskulin: 'der', feminin: 'die', netral: 'das', kein: '' };
 const CONJ_KEYS     = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'Sie'];
 const GIST_ID       = "f9f86c5e14e3c389ff922777d733b174";
 const GIST_TOKEN    = "__GIST_TOKEN__";
@@ -165,8 +165,9 @@ function setCardContent(front, back) {
 }
 
 function renderNounCard(noun) {
-  const article  = ARTICLES[noun.gender] || "der";
-  const gClass   = { maskulin: "gender-m", feminin: "gender-f", netral: "gender-n" }[noun.gender] || "gender-m";
+  const article  = noun.gender === "kein" ? "" : ARTICLES[noun.gender] || "der";
+  const gClass   = { maskulin: "gender-m", feminin: "gender-f", netral: "gender-n", kein: "gender-none" }[noun.gender] || "gender-m";
+  const gLabel   = noun.gender === "kein" ? "kein Artikel" : noun.gender;
   const artClass = article === "der" ? "article-der" : article === "die" ? "article-die" : "";
 
   setCardContent(
@@ -179,10 +180,10 @@ function renderNounCard(noun) {
     </div>`,
     `<div class="back-content">
       <div class="back-header">
-        <span class="badge ${gClass}">${noun.gender}</span>
-        <span class="back-word"><span class="${artClass}">${article}</span> ${escHtml(noun.name)}</span>
+        <span class="badge ${gClass}">${gLabel}</span>
+        <span class="back-word">${article ? `<span class="${artClass}">${article}</span> ` : ""}${escHtml(noun.name)}</span>
       </div>
-      <div class="back-row"><span class="row-label">Plural</span><span>die ${escHtml(noun.plural)}</span></div>
+      <div class="back-row"><span class="row-label">Plural</span><span>${noun.plural ? "die " + escHtml(noun.plural) : "—"}</span></div>
     </div>`
   );
 }
@@ -210,7 +211,7 @@ function renderVerbCard(verb) {
     </div>`,
     `<div class="back-content">
       <div class="back-header">
-        <span class="badge ${typeClass}">${verb.type}</span>
+        ${verb.reflexive ? '<span class="badge reflexive-badge">Reflexiv</span>' : ""}${verb.trennbar ? '<span class="badge trennbar-badge">Trennbar</span>' : ""}<span class="badge ${typeClass}">${verb.type}</span>
         <span class="back-word">${escHtml(verb.name)}</span>
       </div>
       <table class="conj-table">${conjRows}</table>

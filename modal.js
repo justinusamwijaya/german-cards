@@ -22,6 +22,8 @@ function openModal(type, card = null) {
     if (type === "verb") {
       $("verb-name").value = card.name;
       $("verb-type").value = card.type;
+      $("verb-reflexive").checked = !!card.reflexive;
+      $("verb-trennbar").checked  = !!card.trennbar;
       CONJ_KEYS.forEach((key, i) => { $(CONJ_IDS[i]).value = card.conjugations[key] || ""; });
       CONJ_KEYS.forEach((key, i) => { $(PRAE_IDS[i]).value = (card.praeteritum && card.praeteritum[key]) || ""; });
       $("verb-partizip2").value = card.partizip2 || "";
@@ -68,6 +70,8 @@ function clearModal() {
   ["adv-name", "adv-eng", "adv-ind"].forEach((id) => { $(id).value = ""; });
   ["prep-name", "prep-eng", "prep-ind"].forEach((id) => { $(id).value = ""; });
   $("verb-type").value  = "regular";
+  $("verb-reflexive").checked = false;
+  $("verb-trennbar").checked  = false;
   $("noun-gender").value = "maskulin";
   $("adv-type").value   = "modal";
   $("prep-case").value  = "dativ";
@@ -104,6 +108,8 @@ function saveCard() {
       id: state.editingId || genId(),
       name,
       type: $("verb-type").value,
+      ...($("verb-reflexive").checked && { reflexive: true }),
+      ...($("verb-trennbar").checked  && { trennbar: true }),
       conjugations: conj,
       praeteritum: prae,
       partizip2: $("verb-partizip2").value.trim(),
@@ -258,6 +264,8 @@ const BULK_PLACEHOLDERS = {
   verb: `{
   "name": "gehen",
   "type": "regular",
+  "reflexive": false,
+  "trennbar": false,
   "conjugations": {
     "ich": "gehe", "du": "gehst", "er/sie/es": "geht",
     "wir": "gehen", "ihr": "geht", "Sie": "gehen"
@@ -349,11 +357,17 @@ function validateBulkEntry(type, entry) {
     if (!("name"   in entry)) return 'Missing key "name"';
     if (!("plural" in entry)) return 'Missing key "plural"';
     if (!("gender" in entry)) return 'Missing key "gender"';
+    if (!["maskulin", "feminin", "netral", "neutrum", "kein"].includes(entry.gender))
+      return `Invalid "gender": "${entry.gender}" — must be maskulin, feminin, netral or kein`;
   } else if (type === "verb") {
     if (!("name" in entry))          return 'Missing key "name"';
     if (!("type" in entry))          return 'Missing key "type"';
     if (!("conjugations" in entry))  return 'Missing key "conjugations"';
     if (!("praeteritum" in entry))   return 'Missing key "praeteritum"';
+    if ("reflexive" in entry && typeof entry.reflexive !== "boolean")
+      return '"reflexive" must be true or false';
+    if ("trennbar" in entry && typeof entry.trennbar !== "boolean")
+      return '"trennbar" must be true or false';
     for (const key of CONJ_KEYS) {
       if (!(key in entry.conjugations)) return `Missing conjugations["${key}"]`;
       if (!(key in entry.praeteritum))  return `Missing praeteritum["${key}"]`;

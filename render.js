@@ -31,21 +31,23 @@ function renderCard() {
 }
 
 function renderNounCard(noun) {
-  const article      = ARTICLES[noun.gender] || "der";
-  const gClass       = { maskulin: "gender-m", feminin: "gender-f", netral: "gender-n" }[noun.gender] || "gender-m";
+  const article      = nounArticle(noun);
+  const gClass       = { maskulin: "gender-m", feminin: "gender-f", netral: "gender-n", kein: "gender-none" }[noun.gender] || "gender-m";
+  const genderLabel  = noun.gender === "kein" ? "kein Artikel" : noun.gender;
   const articleClass = article === "der" ? "article-der" : article === "die" ? "article-die" : "";
+  const articleSpan  = article ? `<span class="card-article ${articleClass}">${article}</span> ` : "";
 
   setCardContent(
     `<div class="card-front-inner">
       <span class="badge noun-badge">Nomen</span>
-      <div class="card-word"><span class="card-article ${articleClass}">${article}</span> ${noun.name}</div>
+      <div class="card-word">${articleSpan}${noun.name}</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
-        <span class="badge ${gClass}">${noun.gender}</span>
-        <span class="back-word">${article} ${noun.name}</span>
+        <span class="badge ${gClass}">${genderLabel}</span>
+        <span class="back-word">${article ? article + " " : ""}${noun.name}</span>
       </div>
-      <div class="back-row"><span class="row-label">Plural</span><span>die ${noun.plural}</span></div>
+      <div class="back-row"><span class="row-label">Plural</span><span>${noun.plural ? "die " + noun.plural : "—"}</span></div>
       <div class="back-row"><span class="flag">🇬🇧</span><span>${noun.meaning.eng}</span></div>
       <div class="back-row"><span class="flag">🇮🇩</span><span>${noun.meaning.ind}</span></div>
     </div>`
@@ -54,6 +56,9 @@ function renderNounCard(noun) {
 
 function renderVerbCard(verb) {
   const typeClass = verb.type === "irregular" ? "irreg-badge" : "reg-badge";
+  const extraBadges =
+    (verb.reflexive ? '<span class="badge reflexive-badge">Reflexiv</span>' : "") +
+    (verb.trennbar  ? '<span class="badge trennbar-badge">Trennbar</span>'  : "");
   const conjRows  = CONJ_KEYS.map(
     (s) => `<tr><td class="subj">${s}</td><td>${verb.conjugations[s] || "—"}</td></tr>`
   ).join("");
@@ -71,14 +76,14 @@ function renderVerbCard(verb) {
   setCardContent(
     `<div class="card-front-inner">
       <div class="badge-row">
-        <span class="badge verb-badge">Verb</span>
+        ${extraBadges}<span class="badge verb-badge">Verb</span>
         <span class="badge ${typeClass}">${verb.type === "irregular" ? "Irregular" : "Regular"}</span>
       </div>
       <div class="card-word">${verb.name}</div>
     </div>`,
     `<div class="back-content">
       <div class="back-header">
-        <span class="badge ${typeClass}">${verb.type}</span>
+        ${extraBadges}<span class="badge ${typeClass}">${verb.type}</span>
         <span class="back-word">${verb.name}</span>
       </div>
       <table class="conj-table">${conjRows}</table>
@@ -165,8 +170,8 @@ function showSummary() {
     listEl.innerHTML =
       '<p class="missed-heading">Didn\'t know:</p>' +
       missed.map((c) => {
-        const label = isNounCard(c)
-          ? `<span class="missed-article">${ARTICLES[c.gender] || "der"}</span> ${escapeHtml(c.name)}`
+        const label = isNounCard(c) && nounArticle(c)
+          ? `<span class="missed-article">${nounArticle(c)}</span> ${escapeHtml(c.name)}`
           : escapeHtml(c.name);
         return `<div class="missed-item">${label}<span class="missed-meaning"> — ${escapeHtml(c.meaning.eng)}</span></div>`;
       }).join("");
