@@ -195,7 +195,7 @@ function saveCard() {
     if (grp && !grp.cardIds.includes(entry.id)) grp.cardIds.push(entry.id);
   }
 
-  saveData(data);
+  saveData(data, entry.name);
   closeModal();
 
   const typeToKey = { verb: "verbs", noun: "nouns", adjective: "adjectives", adverb: "adverbs", preposition: "prepositions" };
@@ -221,7 +221,7 @@ function deleteCard() {
   const data    = loadData();
   const listKey = isNounCard(card) ? "nouns" : isAdjectiveCard(card) ? "adjectives" : isAdverbCard(card) ? "adverbs" : isPrepositionCard(card) ? "prepositions" : "verbs";
   data[listKey] = data[listKey].filter((c) => c.id !== card.id);
-  saveData(data);
+  saveData(data, card.name);
   state.cards.splice(state.index, 1);
   if (state.cards.length === 0) { showSummary(); return; }
   if (state.index >= state.cards.length) state.index = state.cards.length - 1;
@@ -233,7 +233,8 @@ function removeFromGroup(cardId) {
   const group = data.groups.find((g) => g.id === state.activeGroupId);
   if (group) {
     group.cardIds = group.cardIds.filter((id) => id !== cardId);
-    saveData(data);
+    const card = state.cards[state.index];
+    saveData(data, card ? card.name : undefined);
   }
   state.cards.splice(state.index, 1);
   if (state.cards.length === 0) { showSummary(); return; }
@@ -426,7 +427,7 @@ function saveBulkVocab() {
     data[key].push({ id: genId(), ...rest });
   }
 
-  saveData(data);
+  saveData(data, entries.length === 1 ? entries[0].name : `${entries.length} cards`);
   closeBulkModal();
   switchDeck(key);
 }
@@ -465,15 +466,17 @@ function saveBulkVocabCombined() {
   }
 
   const data = loadData();
+  let added = 0;
   for (const key of keys) {
     const entries = parsed[key] || [];
     for (const entry of entries) {
       const { id: _ignored, ...rest } = entry;
       data[key].push({ id: genId(), ...rest });
+      added++;
     }
   }
 
-  saveData(data);
+  saveData(data, `${added} cards`);
   closeBulkModal();
   switchDeck(state.deck);
 }
@@ -488,7 +491,7 @@ function importData(file) {
       if (!data.adjectives)   data.adjectives   = [];
       if (!data.adverbs)      data.adverbs      = [];
       if (!data.prepositions) data.prepositions = [];
-      saveData(data);
+      saveData(data, "imported file");
       switchDeck(state.deck);
     } catch {
       alert('Could not import: file must be a valid vocab.txt with "verbs" and "nouns" arrays.');

@@ -316,7 +316,18 @@ function loadData() {
   return data;
 }
 
-function saveData(data) {
+const PENDING_KEY       = "updatetobepushed";
+const PENDING_LABEL_KEY = "updatetobepushed-label";
+// Failures retry immediately; after this many rapid attempts, pace out so we
+// don't hammer GitHub's rate limit (which would only delay recovery)
+const FAST_RETRIES  = 5;
+const SLOW_RETRY_MS = 3000;
+
+let _pushTimer    = null;
+let _pushInFlight = false;
+let _pushAttempts = 0;
+
+function saveData(data, label) {
   // Preserve the auth key so it survives round-trips through localStorage
   let toStore = data;
   const existingRaw = localStorage.getItem(STORAGE_KEY);
@@ -325,25 +336,91 @@ function saveData(data) {
     if (existing[GIST_AUTH_KEY])
       toStore = { ...data, [GIST_AUTH_KEY]: existing[GIST_AUTH_KEY] };
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
-  if (GIST_ID && GIST_TOKEN && GIST_TOKEN !== "__GIST" + "_TOKEN__") {
-    fetch(`https://api.github.com/gists/${GIST_ID}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `token ${GIST_TOKEN}`,
-      },
-      body: JSON.stringify({
-        files: { [GIST_FILE]: { content: JSON.stringify(toStore, null, 2) } },
-      }),
-    }).catch(() => {});
-  } else {
-    fetch("/vocab.txt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(toStore, null, 2),
-    }).catch(() => {});
+  const serialized = JSON.stringify(toStore);
+  localStorage.setItem(STORAGE_KEY, serialized);
+  // Queue the remote push; the payload stays in localStorage until it succeeds,
+  // so a failed push survives page reloads and keeps retrying.
+  localStorage.setItem(PENDING_KEY, serialized);
+  localStorage.setItem(PENDING_LABEL_KEY, label || "changes");
+  _pushAttempts = 0;
+  pushPending();
+}
+
+function hasPendingPush() {
+  return !!localStorage.getItem(PENDING_KEY);
+}
+
+async function pushPending() {
+  const payload = localStorage.getItem(PENDING_KEY);
+  if (!payload || _pushInFlight) return;
+  const label = localStorage.getItem(PENDING_LABEL_KEY) || "changes";
+  _pushInFlight = true;
+  clearTimeout(_pushTimer);
+  _pushAttempts++;
+  syncToastShow(
+    _pushAttempts > 1 ? `Retrying “${label}” (attempt ${_pushAttempts})…` : `Saving “${label}”…`,
+    "syncing"
+  );
+
+  let ok = false;
+  try {
+    let res;
+    if (GIST_ID && GIST_TOKEN && GIST_TOKEN !== "__GIST" + "_TOKEN__") {
+      res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `token ${GIST_TOKEN}`,
+        },
+        body: JSON.stringify({
+          files: { [GIST_FILE]: { content: JSON.stringify(JSON.parse(payload), null, 2) } },
+        }),
+      });
+    } else {
+      // Local dev fallback (server.js); GitHub Pages always has the token injected
+      res = await fetch("/vocab.txt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      });
+    }
+    ok = res.ok;
+  } catch {
+    ok = false;
   }
+  _pushInFlight = false;
+
+  if (ok) {
+    if (localStorage.getItem(PENDING_KEY) === payload) {
+      localStorage.removeItem(PENDING_KEY);
+      localStorage.removeItem(PENDING_LABEL_KEY);
+      _pushAttempts = 0;
+      syncToastShow(`Saved “${label}”`, "success");
+    } else {
+      // A newer save replaced the payload while this push was in flight
+      _pushAttempts = 0;
+      pushPending();
+    }
+  } else {
+    _pushTimer = setTimeout(pushPending, _pushAttempts < FAST_RETRIES ? 0 : SLOW_RETRY_MS);
+  }
+}
+
+window.addEventListener("online", pushPending);
+
+// ── Sync status toast ─────────────────────────────────────────────────────────
+
+let _syncToastTimer = null;
+
+function syncToastShow(text, kind) {
+  const el = document.getElementById("sync-toast");
+  if (!el) return;
+  el.classList.remove("hidden", "success", "syncing");
+  el.classList.add(kind);
+  document.getElementById("sync-toast-text").textContent = text;
+  clearTimeout(_syncToastTimer);
+  if (kind === "success")
+    _syncToastTimer = setTimeout(() => el.classList.add("hidden"), 2500);
 }
 
 function genId() {

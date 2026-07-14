@@ -356,7 +356,7 @@ function acceptAiEntry() {
     if (grp && !grp.cardIds.includes(card.id)) grp.cardIds.push(card.id);
   }
 
-  saveData(data);
+  saveData(data, card.name);
   switchDeck(deckKey); // refresh deck behind the modal
 
   // Stay open for the next word (batch adding)

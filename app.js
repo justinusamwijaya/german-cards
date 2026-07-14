@@ -436,20 +436,26 @@ function init() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    let data;
-    if (GIST_ID) {
-      const res = await fetch(`https://api.github.com/gists/${GIST_ID}`);
-      if (res.ok) {
-        const gist = await res.json();
-        data = JSON.parse(gist.files[GIST_FILE].content);
-      }
+    if (hasPendingPush()) {
+      // Local data has changes the remote never received — don't clobber
+      // localStorage with the stale remote copy; retry the push instead.
+      pushPending();
     } else {
-      const res = await fetch("/vocab.txt?t=" + Date.now());
-      if (res.ok) data = await res.json();
-    }
-    if (data && Array.isArray(data.verbs) && Array.isArray(data.nouns)) {
-      if (!data.groups) data.groups = [];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      let data;
+      if (GIST_ID) {
+        const res = await fetch(`https://api.github.com/gists/${GIST_ID}`);
+        if (res.ok) {
+          const gist = await res.json();
+          data = JSON.parse(gist.files[GIST_FILE].content);
+        }
+      } else {
+        const res = await fetch("/vocab.txt?t=" + Date.now());
+        if (res.ok) data = await res.json();
+      }
+      if (data && Array.isArray(data.verbs) && Array.isArray(data.nouns)) {
+        if (!data.groups) data.groups = [];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
     }
   } catch {}
 

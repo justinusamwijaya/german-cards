@@ -46,8 +46,9 @@ function promptDeleteGroup(groupId, triggerBtn) {
   btns.querySelector(".group-confirm-yes").addEventListener("click", () => {
     guardCUD(() => {
       const data = loadData();
+      const grp  = data.groups.find((g) => g.id === groupId);
       data.groups = data.groups.filter((g) => g.id !== groupId);
-      saveData(data);
+      saveData(data, grp ? `group ${grp.name}` : "group");
       renderGroupsList();
     });
   });
@@ -149,7 +150,7 @@ function saveGroup() {
     data.groups.push(entry);
   }
 
-  saveData(data);
+  saveData(data, `group ${entry.name}`);
   closeGroupModal();
   renderGroupsList();
 }
