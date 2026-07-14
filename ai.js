@@ -165,8 +165,11 @@ const AI_SYSTEM_PROMPT =
   'plural-only → name: "Eltern (Plural)", plural: "Eltern (Plural)". ' +
   "Normal nouns with both forms get no marker. " +
   'For plural-only nouns always use gender "feminin" so the card shows the article "die". ' +
-  'Use gender "kein" for nouns used without an article (most countries and cities like Deutschland, ' +
-  "languages like Deutsch, and school subjects like Mathematik).";
+  'Use gender "kein" for nouns that are normally used WITHOUT an article in everyday speech, ' +
+  "even when dictionaries assign them a grammatical gender: " +
+  "countries and cities (Deutschland, Berlin), languages (Deutsch), school subjects (Mathematik), " +
+  "and sports, games and hobby activities (Yoga, Parkour, Schach, Fußball as the sport). " +
+  'Judge by usage: if learners would say "Ich mache/spiele/lerne X" with no article, gender is "kein".';
 
 // ── API Call ──────────────────────────────────────────────────────────────────
 
