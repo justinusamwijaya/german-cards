@@ -195,11 +195,18 @@ function renderExercise() {
   $id("teil1-list").innerHTML = session.teil1
     .map((q, i) => {
       const parts = q.sentence.split("___");
+      const vals = Array.isArray(q.studentAnswer)
+        ? q.studentAnswer
+        : [q.studentAnswer];
+      let text = escHtml(parts[0]);
+      for (let b = 0; b < parts.length - 1; b++) {
+        text += `<input type="text" class="blank-input"
+        data-teil="teil1" data-idx="${i}" data-blank="${b}" value="${escHtml(vals[b] || "")}"
+        autocapitalize="off" autocomplete="off" spellcheck="false">${escHtml(parts[b + 1] || "")}`;
+      }
       return `<div class="q-item">
       <span class="q-num">${i + 1}</span>
-      <div class="q-text">${escHtml(parts[0])}<input type="text" class="blank-input"
-        data-teil="teil1" data-idx="${i}" value="${escHtml(q.studentAnswer)}"
-        autocapitalize="off" autocomplete="off" spellcheck="false">${escHtml(parts[1] || "")}</div>
+      <div class="q-text">${text}</div>
     </div>`;
     })
     .join("");
@@ -281,7 +288,16 @@ function onAnswerInput(e) {
   const el = e.target;
   const teil = el.dataset.teil;
   if (!teil || !session) return;
-  session[teil][Number(el.dataset.idx)].studentAnswer = el.value;
+  const item = session[teil][Number(el.dataset.idx)];
+  const nBlanks =
+    teil === "teil1" ? item.sentence.split("___").length - 1 : 1;
+  if (nBlanks > 1) {
+    if (!Array.isArray(item.studentAnswer))
+      item.studentAnswer = new Array(nBlanks).fill("");
+    item.studentAnswer[Number(el.dataset.blank)] = el.value;
+  } else {
+    item.studentAnswer = el.value;
+  }
   el.classList.remove("unanswered");
   saveSessionDebounced();
 }
@@ -507,20 +523,28 @@ async function loadSubmissions() {
 function submissionHtml(sub) {
   const date = new Date(sub.timestamp).toLocaleString();
   const t1 = (sub.teil1 || [])
-    .map(
-      (q, i) => `<div class="item">
-      <p class="prob">${i + 1}. ${escHtml(q.sentence)} <em>(${escHtml(q.verb)})</em></p>
-      <p class="ans">Antwort: <strong>${escHtml(q.studentAnswer || "—")}</strong></p>
+    .map((q, i) => {
+      const parts = q.sentence.split("___");
+      const vals = Array.isArray(q.studentAnswer)
+        ? q.studentAnswer
+        : [q.studentAnswer];
+      let filled = escHtml(parts[0]);
+      for (let b = 0; b < parts.length - 1; b++) {
+        const v = (vals[b] || "").trim();
+        filled += `<strong class="stud">${escHtml(v || "___")}</strong>${escHtml(parts[b + 1] || "")}`;
+      }
+      return `<div class="item">
+      <p class="prob">${i + 1}. ${filled}</p>
       <p class="aid">Richtig: ${escHtml((q.answers || []).join(" / "))}</p>
-    </div>`,
-    )
+    </div>`;
+    })
     .join("");
   const t2 = (sub.teil2 || [])
     .map(
       (q, i) => `<div class="item">
       <p class="prob">${i + 1}. <strong>${escHtml(q.word)}</strong>
         <em>(${q.deck === "verbs" ? "Verb" : "Nomen"}${q.meaning && q.meaning.ind ? " · " + escHtml(q.meaning.ind) : ""}${q.meaning && q.meaning.eng ? " · " + escHtml(q.meaning.eng) : ""})</em></p>
-      <p class="ans">Satz: <strong>${escHtml(q.studentAnswer || "—")}</strong></p>
+      <p class="ans">Satz: <strong class="stud">${escHtml(q.studentAnswer || "—")}</strong></p>
     </div>`,
     )
     .join("");
@@ -528,7 +552,7 @@ function submissionHtml(sub) {
     .map(
       (q, i) => `<div class="item">
       <p class="prob">${i + 1}. ${escHtml(q.de)}</p>
-      <p class="ans">Übersetzung: <strong>${escHtml(q.studentAnswer || "—")}</strong></p>
+      <p class="ans">Übersetzung: <strong class="stud">${escHtml(q.studentAnswer || "—")}</strong></p>
       <p class="aid">Referenz: ${escHtml(q.ind || "")}</p>
     </div>`,
     )
@@ -547,6 +571,7 @@ function submissionHtml(sub) {
   .prob { margin: 0 0 2px; }
   .ans { margin: 0 0 1px; background: #f3f3f3; padding: 2px 6px; border-radius: 4px; }
   .aid { margin: 0; color: #777; font-size: 10.5px; }
+  .stud { color: #c62828; font-weight: bold; }
 </style>
 <h1>Review A1</h1>
 <p class="meta">Name: <strong>${escHtml(sub.name || "?")}</strong> &nbsp;·&nbsp; ${escHtml(date)}</p>
