@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Training</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="view active">
+
+    <header class="tr-header">
+      <a href="../index.html" class="header-btn tr-back">‹</a>
+      <span class="tr-title" id="tr-title">Training</span>
+      <button class="header-btn" id="btn-admin">Admin</button>
+    </header>
+
+    <div class="tr-main">
+
+      <!-- Training list -->
+      <div id="view-list">
+        <p class="tr-intro">Pilih latihan:</p>
+        <button class="training-card" data-training="review-a1">
+          <span class="training-card-name">Review A1</span>
+          <span class="training-card-desc">Teil 1: Konjugation (15) &middot; Teil 2: Sätze schreiben (10) &middot; Teil 3: Übersetzung (10)</span>
+        </button>
+        <p class="tr-loading hidden" id="list-status"></p>
+      </div>
+
+      <!-- Exercise -->
+      <div id="view-exercise" class="hidden">
+
+        <section class="teil-section">
+          <h2 class="teil-title">Teil 1 &middot; Konjugation</h2>
+          <p class="teil-desc">Ergänzen Sie das Verb in der richtigen Form. (Isi dengan konjugasi yang benar.)</p>
+          <div id="teil1-list"></div>
+        </section>
+
+        <section class="teil-section">
+          <h2 class="teil-title">Teil 2 &middot; Sätze schreiben</h2>
+          <p class="teil-desc">Schreiben Sie einen Satz mit diesem Wort. (Buat kalimat dengan kata yang diberikan.)</p>
+          <div id="teil2-list"></div>
+        </section>
+
+        <section class="teil-section">
+          <h2 class="teil-title">Teil 3 &middot; Übersetzung</h2>
+          <p class="teil-desc">Übersetzen Sie ins Indonesische. (Terjemahkan ke bahasa Indonesia.)</p>
+          <div id="teil3-list"></div>
+        </section>
+
+        <div class="submit-bar">
+          <button id="btn-submit">Abgeben / Submit</button>
+          <p id="submit-status" class="hidden"></p>
+          <button id="btn-download-fallback" class="hidden">⬇ Download answers</button>
+        </div>
+
+      </div>
+
+      <!-- Done -->
+      <div id="view-done" class="hidden">
+        <div class="done-card">
+          <h2>Vielen Dank! 🎉</h2>
+          <p id="done-text"></p>
+          <button id="btn-done-back">Zurück</button>
+        </div>
+      </div>
+
+      <!-- Admin -->
+      <div id="view-admin" class="hidden">
+        <div class="admin-head">
+          <h2>Submissions</h2>
+          <button class="header-btn" id="btn-admin-refresh">↻ Refresh</button>
+        </div>
+        <p class="tr-loading hidden" id="admin-status"></p>
+        <div id="submissions-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Name modal -->
+  <div id="name-modal-overlay" class="tr-overlay hidden">
+    <div class="modal tr-modal">
+      <h2>Abgeben</h2>
+      <div class="form-group">
+        <label for="student-name">Dein Name / Nama kamu</label>
+        <input type="text" id="student-name" autocomplete="off" maxlength="60">
+      </div>
+      <div class="tr-modal-buttons">
+        <button id="btn-name-cancel">Batal</button>
+        <button id="btn-name-confirm" class="primary-btn">Kirim</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume modal -->
+  <div id="resume-modal-overlay" class="tr-overlay hidden">
+    <div class="modal tr-modal">
+      <h2>Lanjutkan?</h2>
+      <p class="tr-modal-text">Lanjutkan dari pekerjaan terakhir?</p>
+      <div class="tr-modal-buttons">
+        <button id="btn-resume-new">Mulai baru</button>
+        <button id="btn-resume-continue" class="primary-btn">Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

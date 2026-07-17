@@ -22,6 +22,7 @@ jobs:
         run: |
           sed -i "s/__GIST_TOKEN__/${{ secrets.GIST_TOKEN }}/g" data.js
           sed -i "s/__GIST_TOKEN__/${{ secrets.GIST_TOKEN }}/g" vocabgendertraining/app.js
+          sed -i "s/__GIST_TOKEN__/${{ secrets.GIST_TOKEN }}/g" training/app.js
 
       - uses: actions/configure-pages@v5
 

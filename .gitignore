@@ -3,3 +3,5 @@ vocab.txt
 clean-vocab.js
 oldvocab.txt
 api-key.txt
+training-submissions.json
+training/bank.txt
