@@ -214,13 +214,9 @@ function renderExercise() {
   $id("teil2-list").innerHTML = session.teil2
     .map((q, i) => {
       const badge = q.deck === "verbs" ? "Verb" : "Nomen";
-      const meaning =
-        q.meaning && q.meaning.ind
-          ? ` <span class="q-verb-hint">(${escHtml(q.meaning.ind)})</span>`
-          : "";
       return `<div class="q-item">
       <span class="q-num">${i + 1}</span>
-      <div class="q-text"><span class="q-word">${escHtml(q.word)}</span><span class="q-word-badge">${badge}</span>${meaning}</div>
+      <div class="q-text"><span class="q-word">${escHtml(q.word)}</span><span class="q-word-badge">${badge}</span></div>
       <input type="text" class="full-input" data-teil="teil2" data-idx="${i}"
         value="${escHtml(q.studentAnswer)}" autocomplete="off" spellcheck="false">
     </div>`;
