@@ -1,16 +1,16 @@
 // ── Training module (Review A1) ───────────────────────────────────────────────
 
-const GIST_ID               = "f9f86c5e14e3c389ff922777d733b174";
-const BANK_GIST_ID          = ""; // gist that holds bank.txt (question banks)
-const GIST_TOKEN            = "__GIST_TOKEN__";
-const GIST_VOCAB_FILE       = "vocab.txt";
-const GIST_BANK_FILE        = "bank.txt";
+const GIST_ID = "f9f86c5e14e3c389ff922777d733b174";
+const BANK_GIST_ID = "f363dba0f4678f9328e71109fef35fb4"; // gist that holds bank.txt (question banks)
+const GIST_TOKEN = "__GIST_TOKEN__";
+const GIST_VOCAB_FILE = "vocab.txt";
+const GIST_BANK_FILE = "bank.txt";
 const GIST_SUBMISSIONS_FILE = "training-submissions.json";
-const TOKEN_KEY             = "gc_token";
-const GIST_AUTH_KEY         = "AsYx_O!!2";
-const SESSION_KEY           = "gc-training-session";
+const TOKEN_KEY = "gc_token";
+const GIST_AUTH_KEY = "AsYx_O!!2";
+const SESSION_KEY = "gc-training-session";
 
-const ARTICLES   = { maskulin: "der", feminin: "die", netral: "das", kein: "" };
+const ARTICLES = { maskulin: "der", feminin: "die", netral: "das", kein: "" };
 const CHAPTER_RE = /^Chapter ([1-9]|1[0-2])$/;
 
 const TEIL1_COUNT = 15;
@@ -22,9 +22,9 @@ function hasToken() {
   return !!GIST_TOKEN && GIST_TOKEN !== "__GIST" + "_TOKEN__";
 }
 
-let bank      = null;
+let bank = null;
 let vocabData = null;
-let session   = null;
+let session = null;
 
 const $id = (id) => document.getElementById(id);
 
@@ -55,7 +55,9 @@ const sample = (arr, n) => shuffle(arr).slice(0, n);
 
 async function fetchGistFile(gistId, fileName) {
   const headers = hasToken() ? { Authorization: `token ${GIST_TOKEN}` } : {};
-  const res = await fetch(`https://api.github.com/gists/${gistId}`, { headers });
+  const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+    headers,
+  });
   if (!res.ok) throw new Error(`gist ${gistId}: HTTP ${res.status}`);
   const gist = await res.json();
   const file = gist.files && gist.files[fileName];
@@ -73,7 +75,10 @@ async function loadBank() {
   if (BANK_GIST_ID) {
     try {
       const content = await fetchGistFile(BANK_GIST_ID, GIST_BANK_FILE);
-      if (content) { bank = JSON.parse(content); return bank; }
+      if (content) {
+        bank = JSON.parse(content);
+        return bank;
+      }
     } catch (e) {}
   }
   const res = await fetch(`bank.txt?t=${Date.now()}`);
@@ -86,7 +91,10 @@ async function loadVocab() {
   if (vocabData) return vocabData;
   try {
     const content = await fetchGistFile(GIST_ID, GIST_VOCAB_FILE);
-    if (content) { vocabData = JSON.parse(content); return vocabData; }
+    if (content) {
+      vocabData = JSON.parse(content);
+      return vocabData;
+    }
   } catch (e) {}
   const res = await fetch(`../vocab.txt?t=${Date.now()}`);
   if (!res.ok) throw new Error("vocab not found");
@@ -101,8 +109,11 @@ const VIEW_IDS = ["view-list", "view-exercise", "view-done", "view-admin"];
 function showView(id) {
   VIEW_IDS.forEach((v) => $id(v).classList.toggle("hidden", v !== id));
   $id("tr-title").textContent =
-    id === "view-exercise" ? "Review A1" :
-    id === "view-admin"    ? "Training · Admin" : "Training";
+    id === "view-exercise"
+      ? "Review A1"
+      : id === "view-admin"
+        ? "Training · Admin"
+        : "Training";
   window.scrollTo(0, 0);
 }
 
@@ -112,7 +123,7 @@ function buildTeil2Pool() {
   const chapterIds = new Set(
     (vocabData.groups || [])
       .filter((g) => CHAPTER_RE.test(g.name))
-      .flatMap((g) => g.cardIds || [])
+      .flatMap((g) => g.cardIds || []),
   );
   const nouns = (vocabData.nouns || [])
     .filter((n) => chapterIds.has(n.id))
@@ -124,7 +135,12 @@ function buildTeil2Pool() {
     }));
   const verbs = (vocabData.verbs || [])
     .filter((v) => chapterIds.has(v.id))
-    .map((v) => ({ wordId: v.id, word: v.name, deck: "verbs", meaning: v.meaning || {} }));
+    .map((v) => ({
+      wordId: v.id,
+      word: v.name,
+      deck: "verbs",
+      meaning: v.meaning || {},
+    }));
   return nouns.concat(verbs);
 }
 
@@ -132,9 +148,18 @@ function buildSession() {
   return {
     training: "review-a1",
     startedAt: new Date().toISOString(),
-    teil1: sample(bank.teil1, TEIL1_COUNT).map((q) => ({ ...q, studentAnswer: "" })),
-    teil2: sample(buildTeil2Pool(), TEIL2_COUNT).map((q) => ({ ...q, studentAnswer: "" })),
-    teil3: sample(bank.teil3, TEIL3_COUNT).map((q) => ({ ...q, studentAnswer: "" })),
+    teil1: sample(bank.teil1, TEIL1_COUNT).map((q) => ({
+      ...q,
+      studentAnswer: "",
+    })),
+    teil2: sample(buildTeil2Pool(), TEIL2_COUNT).map((q) => ({
+      ...q,
+      studentAnswer: "",
+    })),
+    teil3: sample(bank.teil3, TEIL3_COUNT).map((q) => ({
+      ...q,
+      studentAnswer: "",
+    })),
   };
 }
 
@@ -143,7 +168,8 @@ function loadSavedSession() {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
-    if (s && s.training === "review-a1" && s.teil1 && s.teil2 && s.teil3) return s;
+    if (s && s.training === "review-a1" && s.teil1 && s.teil2 && s.teil3)
+      return s;
   } catch (e) {}
   return null;
 }
@@ -152,7 +178,9 @@ let _saveTimer = null;
 function saveSessionDebounced() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
-    try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (e) {}
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    } catch (e) {}
   }, 300);
 }
 
@@ -164,34 +192,45 @@ function clearSavedSession() {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function renderExercise() {
-  $id("teil1-list").innerHTML = session.teil1.map((q, i) => {
-    const parts = q.sentence.split("___");
-    return `<div class="q-item">
+  $id("teil1-list").innerHTML = session.teil1
+    .map((q, i) => {
+      const parts = q.sentence.split("___");
+      return `<div class="q-item">
       <span class="q-num">${i + 1}</span>
       <div class="q-text">${escHtml(parts[0])}<input type="text" class="blank-input"
         data-teil="teil1" data-idx="${i}" value="${escHtml(q.studentAnswer)}"
         autocapitalize="off" autocomplete="off" spellcheck="false">${escHtml(parts[1] || "")}
         <span class="q-verb-hint">(${escHtml(q.verb)})</span></div>
     </div>`;
-  }).join("");
+    })
+    .join("");
 
-  $id("teil2-list").innerHTML = session.teil2.map((q, i) => {
-    const badge = q.deck === "verbs" ? "Verb" : "Nomen";
-    const meaning = q.meaning && q.meaning.ind ? ` <span class="q-verb-hint">(${escHtml(q.meaning.ind)})</span>` : "";
-    return `<div class="q-item">
+  $id("teil2-list").innerHTML = session.teil2
+    .map((q, i) => {
+      const badge = q.deck === "verbs" ? "Verb" : "Nomen";
+      const meaning =
+        q.meaning && q.meaning.ind
+          ? ` <span class="q-verb-hint">(${escHtml(q.meaning.ind)})</span>`
+          : "";
+      return `<div class="q-item">
       <span class="q-num">${i + 1}</span>
       <div class="q-text"><span class="q-word">${escHtml(q.word)}</span><span class="q-word-badge">${badge}</span>${meaning}</div>
       <input type="text" class="full-input" data-teil="teil2" data-idx="${i}"
         value="${escHtml(q.studentAnswer)}" autocomplete="off" spellcheck="false">
     </div>`;
-  }).join("");
+    })
+    .join("");
 
-  $id("teil3-list").innerHTML = session.teil3.map((q, i) => `<div class="q-item">
+  $id("teil3-list").innerHTML = session.teil3
+    .map(
+      (q, i) => `<div class="q-item">
       <span class="q-num">${i + 1}</span>
       <div class="q-text">${escHtml(q.de)}</div>
       <textarea class="full-input" rows="2" data-teil="teil3" data-idx="${i}"
         autocomplete="off" spellcheck="false">${escHtml(q.studentAnswer)}</textarea>
-    </div>`).join("");
+    </div>`,
+    )
+    .join("");
 
   $id("btn-submit").disabled = false;
   $id("submit-status").classList.add("hidden");
@@ -207,7 +246,8 @@ async function startTraining() {
   try {
     await Promise.all([loadBank(), loadVocab()]);
   } catch (e) {
-    status.textContent = "Gagal memuat soal. Periksa koneksi internet, lalu coba lagi.";
+    status.textContent =
+      "Gagal memuat soal. Periksa koneksi internet, lalu coba lagi.";
     return;
   }
   status.classList.add("hidden");
@@ -288,7 +328,11 @@ async function readSubmissionsStore() {
   if (hasToken()) {
     const content = await fetchGistFile(GIST_ID, GIST_SUBMISSIONS_FILE);
     if (!content) return { submissions: [] };
-    try { return JSON.parse(content); } catch (e) { return { submissions: [] }; }
+    try {
+      return JSON.parse(content);
+    } catch (e) {
+      return { submissions: [] };
+    }
   }
   // local dev
   try {
@@ -307,7 +351,9 @@ async function writeSubmissionsStore(store) {
         Authorization: `token ${GIST_TOKEN}`,
       },
       body: JSON.stringify({
-        files: { [GIST_SUBMISSIONS_FILE]: { content: JSON.stringify(store, null, 2) } },
+        files: {
+          [GIST_SUBMISSIONS_FILE]: { content: JSON.stringify(store, null, 2) },
+        },
       }),
     });
     if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
@@ -354,7 +400,8 @@ async function submitWithName(name) {
     await sendSubmission(submission);
   } catch (e) {
     btn.disabled = false;
-    status.textContent = "Gagal menyimpan jawaban. Coba lagi, atau download jawabanmu di bawah dan kirim manual.";
+    status.textContent =
+      "Gagal menyimpan jawaban. Coba lagi, atau download jawabanmu di bawah dan kirim manual.";
     status.classList.remove("ok");
     $id("btn-download-fallback").classList.remove("hidden");
     return;
@@ -369,7 +416,9 @@ async function submitWithName(name) {
 
 function downloadFallback() {
   if (!_pendingSubmission) return;
-  const blob = new Blob([JSON.stringify(_pendingSubmission, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(_pendingSubmission, null, 2)], {
+    type: "application/json",
+  });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -402,9 +451,15 @@ async function adminGate() {
   if (username === null || username.trim() !== "admin") return false;
   const password = window.prompt("Password:");
   if (password === null) return false;
-  if (password !== "admindeutsch") { window.alert("Incorrect password."); return false; }
+  if (password !== "admindeutsch") {
+    window.alert("Incorrect password.");
+    return false;
+  }
   const token = await fetchRemoteToken();
-  if (!token) { window.alert("Could not reach server."); return false; }
+  if (!token) {
+    window.alert("Could not reach server.");
+    return false;
+  }
   localStorage.setItem(TOKEN_KEY, token);
   return true;
 }
@@ -437,32 +492,48 @@ async function loadSubmissions() {
     return;
   }
   status.classList.add("hidden");
-  list.innerHTML = _submissions.map((s, i) => `<div class="submission-row">
+  list.innerHTML = _submissions
+    .map(
+      (s, i) => `<div class="submission-row">
       <span class="s-name">${escHtml(s.name || "?")}</span>
       <span class="s-date">${escHtml(new Date(s.timestamp).toLocaleString())}</span>
       <button class="s-pdf" data-sub="${i}">Download PDF</button>
-    </div>`).join("");
+    </div>`,
+    )
+    .join("");
 }
 
 // ── PDF (print window) ────────────────────────────────────────────────────────
 
 function submissionHtml(sub) {
   const date = new Date(sub.timestamp).toLocaleString();
-  const t1 = (sub.teil1 || []).map((q, i) => `<div class="item">
+  const t1 = (sub.teil1 || [])
+    .map(
+      (q, i) => `<div class="item">
       <p class="prob">${i + 1}. ${escHtml(q.sentence)} <em>(${escHtml(q.verb)})</em></p>
       <p class="ans">Antwort: <strong>${escHtml(q.studentAnswer || "—")}</strong></p>
       <p class="aid">Richtig: ${escHtml((q.answers || []).join(" / "))}</p>
-    </div>`).join("");
-  const t2 = (sub.teil2 || []).map((q, i) => `<div class="item">
+    </div>`,
+    )
+    .join("");
+  const t2 = (sub.teil2 || [])
+    .map(
+      (q, i) => `<div class="item">
       <p class="prob">${i + 1}. <strong>${escHtml(q.word)}</strong>
         <em>(${q.deck === "verbs" ? "Verb" : "Nomen"}${q.meaning && q.meaning.ind ? " · " + escHtml(q.meaning.ind) : ""}${q.meaning && q.meaning.eng ? " · " + escHtml(q.meaning.eng) : ""})</em></p>
       <p class="ans">Satz: <strong>${escHtml(q.studentAnswer || "—")}</strong></p>
-    </div>`).join("");
-  const t3 = (sub.teil3 || []).map((q, i) => `<div class="item">
+    </div>`,
+    )
+    .join("");
+  const t3 = (sub.teil3 || [])
+    .map(
+      (q, i) => `<div class="item">
       <p class="prob">${i + 1}. ${escHtml(q.de)}</p>
       <p class="ans">Übersetzung: <strong>${escHtml(q.studentAnswer || "—")}</strong></p>
       <p class="aid">Referenz: ${escHtml(q.ind || "")}</p>
-    </div>`).join("");
+    </div>`,
+    )
+    .join("");
 
   return `<meta charset="UTF-8">
 <style>
@@ -487,7 +558,10 @@ function submissionHtml(sub) {
 
 function downloadPdf(sub) {
   const w = window.open("", "_blank");
-  if (!w) { window.alert("Pop-up blocked. Please allow pop-ups for this site."); return; }
+  if (!w) {
+    window.alert("Pop-up blocked. Please allow pop-ups for this site.");
+    return;
+  }
   w.document.write(submissionHtml(sub));
   const day = (sub.timestamp || "").slice(0, 10);
   w.document.title = `ReviewA1_${(sub.name || "student").replace(/[^\w-]+/g, "_")}_${day}`;
@@ -517,10 +591,15 @@ function init() {
   });
   $id("btn-name-confirm").addEventListener("click", () => {
     const name = $id("student-name").value.trim();
-    if (!name) { $id("student-name").classList.add("unanswered"); return; }
+    if (!name) {
+      $id("student-name").classList.add("unanswered");
+      return;
+    }
     submitWithName(name);
   });
-  $id("student-name").addEventListener("input", (e) => e.target.classList.remove("unanswered"));
+  $id("student-name").addEventListener("input", (e) =>
+    e.target.classList.remove("unanswered"),
+  );
   $id("student-name").addEventListener("keydown", (e) => {
     if (e.key === "Enter") $id("btn-name-confirm").click();
   });
