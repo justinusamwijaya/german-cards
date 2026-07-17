@@ -199,8 +199,7 @@ function renderExercise() {
       <span class="q-num">${i + 1}</span>
       <div class="q-text">${escHtml(parts[0])}<input type="text" class="blank-input"
         data-teil="teil1" data-idx="${i}" value="${escHtml(q.studentAnswer)}"
-        autocapitalize="off" autocomplete="off" spellcheck="false">${escHtml(parts[1] || "")}
-        <span class="q-verb-hint">(${escHtml(q.verb)})</span></div>
+        autocapitalize="off" autocomplete="off" spellcheck="false">${escHtml(parts[1] || "")}</div>
     </div>`;
     })
     .join("");
