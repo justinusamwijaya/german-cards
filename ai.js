@@ -315,10 +315,15 @@ function renderAiPreview(type, entry) {
     badge = e(entry.prepCase || "");
   }
 
+  const dup = findDuplicateCard(type, entry.name);
+  const dupLine = dup
+    ? `<div class="dup-warning">⚠ „${e(dup.name)}“ is already in your ${e(AI_DECK_KEYS[type])}</div>`
+    : "";
+
   $("ai-preview-content").innerHTML = `
     <div class="ai-question">Add <b>${title}</b> — ${meanings}?</div>
     ${badge ? `<span class="ai-badge">${badge}</span>` : ""}${extraBadges}
-    ${details}`;
+    ${details}${dupLine}`;
 }
 
 // ── Mismatch Yes / No ─────────────────────────────────────────────────────────

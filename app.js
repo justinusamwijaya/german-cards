@@ -345,6 +345,7 @@ function init() {
         input.value = val;
         input.setSelectionRange(pos, pos);
       }
+      updateDupWarningFor(input.id);
     });
   });
 
@@ -421,6 +422,7 @@ function init() {
   const _headerRight = document.querySelector("#view-study .header-right");
   $("btn-hamburger").addEventListener("click", (e) => {
     e.stopPropagation();
+    hide("search-dropdown");
     _headerRight.classList.toggle("open");
   });
   document.addEventListener("click", (e) => {

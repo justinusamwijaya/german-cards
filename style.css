@@ -1777,6 +1777,18 @@ body {
   margin-top: 0.5rem;
 }
 
+/* Duplicate-word warning (add/edit modal, manual + AI) */
+.form-group input.input-dup,
+.form-group input.input-dup:focus {
+  border-color: #f59e0b;
+}
+
+.dup-warning {
+  color: #b45309;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
 /* Preview */
 #ai-preview-content {
   border: 2px solid #f0f4ff;

@@ -1,5 +1,49 @@
 // ── Card Modal (Add / Edit) ───────────────────────────────────────────────────
 
+// ── Duplicate-word warning ────────────────────────────────────────────────────
+
+const DUP_NAME_INPUTS = { verb: "verb-name", noun: "noun-name", adjective: "adj-name", adverb: "adv-name", preposition: "prep-name" };
+
+function normalizeDupName(name) {
+  return name.trim().toLowerCase().replace(/\s*\((singular|plural)\)$/i, "");
+}
+
+function findDuplicateCard(type, name) {
+  const key  = AI_DECK_KEYS[type];
+  const norm = normalizeDupName(name || "");
+  if (!key || !norm) return null;
+  return loadData()[key].find((c) => c.id !== state.editingId && normalizeDupName(c.name) === norm) || null;
+}
+
+function updateDupWarning(type) {
+  const input  = $(DUP_NAME_INPUTS[type]);
+  const warnEl = $(DUP_NAME_INPUTS[type] + "-dup");
+  const dup    = findDuplicateCard(type, input.value);
+  input.classList.toggle("input-dup", !!dup);
+  warnEl.textContent = dup ? `⚠ „${dup.name}“ is already in your ${AI_DECK_KEYS[type]}` : "";
+  setVisible(warnEl.id, !!dup);
+}
+
+function updateAiWordDup() {
+  const dup = findDuplicateCard(state.modalType, $("ai-word").value);
+  $("ai-word").classList.toggle("input-dup", !!dup);
+  $("ai-word-dup").textContent = dup ? `⚠ „${dup.name}“ is already in your ${AI_DECK_KEYS[state.modalType]}` : "";
+  setVisible("ai-word-dup", !!dup);
+}
+
+// Re-checks every dup-aware input (values persist across type switches)
+function refreshDupWarnings() {
+  Object.keys(DUP_NAME_INPUTS).forEach(updateDupWarning);
+  updateAiWordDup();
+}
+
+// Called from the shared modal input handler, after ä/ö/ü/ß shortcut expansion
+function updateDupWarningFor(inputId) {
+  if (inputId === "ai-word") { updateAiWordDup(); return; }
+  const type = Object.keys(DUP_NAME_INPUTS).find((t) => DUP_NAME_INPUTS[t] === inputId);
+  if (type) updateDupWarning(type);
+}
+
 function openModal(type, card = null) {
   state.editingId  = card ? card.id : null;
   state.modalType  = type;
@@ -78,6 +122,7 @@ function clearModal() {
   $("ai-word").value    = "";
   resetAiPreview();
   setVisible("ai-key-editor", false);
+  refreshDupWarnings();
 }
 
 function switchModalType(type) {
@@ -91,6 +136,7 @@ function switchModalType(type) {
   document.querySelectorAll(".type-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
+  refreshDupWarnings();
 }
 
 function saveCard() {
