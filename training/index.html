@@ -96,6 +96,26 @@
     </div>
   </div>
 
+  <!-- Admin login modal -->
+  <div id="login-modal-overlay" class="tr-overlay hidden">
+    <div class="modal tr-modal">
+      <h2>Admin Login</h2>
+      <div class="form-group">
+        <label for="login-user">User</label>
+        <input type="text" id="login-user" autocapitalize="none" autocomplete="username" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="form-group">
+        <label for="login-pass">Password</label>
+        <input type="password" id="login-pass" autocomplete="current-password">
+      </div>
+      <p id="login-error" class="login-error hidden"></p>
+      <div class="tr-modal-buttons">
+        <button id="btn-login-cancel">Cancel</button>
+        <button id="btn-login-confirm" class="primary-btn">Log in</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Resume modal -->
   <div id="resume-modal-overlay" class="tr-overlay hidden">
     <div class="modal tr-modal">

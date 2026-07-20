@@ -1001,7 +1001,8 @@ body {
 
 #modal-overlay,
 #modal-group-overlay,
-#modal-bulk-overlay {
+#modal-bulk-overlay,
+#modal-login-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
@@ -1011,6 +1012,42 @@ body {
   z-index: 100;
   padding: 1rem;
   overflow-y: auto;
+}
+
+/* Login can appear on top of another modal (e.g. Save inside Add Card) */
+#modal-login-overlay {
+  z-index: 200;
+}
+
+.login-modal {
+  width: min(380px, 100%);
+}
+
+.login-error {
+  color: #c62828;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+#btn-login-confirm {
+  background: #1a3c5e;
+  color: white;
+  border: 2px solid #1a3c5e;
+}
+#btn-login-confirm:hover {
+  background: #14304c;
+}
+#btn-login-confirm:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+#btn-login-cancel {
+  background: transparent;
+  color: #666;
+  border: 2px solid #ddd;
+}
+#btn-login-cancel:hover {
+  background: #f5f5f5;
 }
 
 .modal {

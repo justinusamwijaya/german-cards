@@ -359,6 +359,13 @@ function init() {
     if (e.target === $("modal-overlay")) closeModal();
   });
 
+  // Admin login modal
+  $("btn-login-confirm").addEventListener("click", submitLogin);
+  $("btn-login-cancel").addEventListener("click",  closeLoginModal);
+  $("modal-login-overlay").addEventListener("click", (e) => {
+    if (e.target === $("modal-login-overlay")) closeLoginModal();
+  });
+
   // AI mode (switch → generate → preview → accept)
   $("ai-mode-toggle").addEventListener("change", (e) => setAiMode(e.target.checked));
   $("btn-ai-generate").addEventListener("click", aiGenerate);
@@ -387,6 +394,12 @@ function init() {
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
+    // Login modal sits on top of everything — handle it first
+    if (isLoginModalOpen()) {
+      if (e.key === "Escape") closeLoginModal();
+      if (e.key === "Enter")  submitLogin();
+      return;
+    }
     if (e.key === "Escape") {
       if (!$("modal-group-overlay").classList.contains("hidden")) closeGroupModal();
       else if (!$("modal-bulk-overlay").classList.contains("hidden")) closeBulkModal();
@@ -400,8 +413,8 @@ function init() {
         return;
       }
       if (document.activeElement.tagName !== "SELECT") {
-        if (e.shiftKey) { const type = state.modalType; saveCard(); openModal(type); }
-        else saveCard();
+        if (e.shiftKey) { const type = state.modalType; guardCUD(() => { saveCard(); openModal(type); }); }
+        else guardCUD(saveCard);
       }
     }
   });

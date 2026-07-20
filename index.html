@@ -602,6 +602,37 @@
       </div>
     </div>
 
+    <!-- ── Admin Login Modal ─────────────────────────────────── -->
+    <div id="modal-login-overlay" class="hidden">
+      <div class="modal login-modal">
+        <h2>Admin Login</h2>
+        <div class="form-group">
+          <label>User</label>
+          <input
+            type="text"
+            id="login-user"
+            autocapitalize="none"
+            autocomplete="username"
+            autocorrect="off"
+            spellcheck="false"
+          />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            id="login-pass"
+            autocomplete="current-password"
+          />
+        </div>
+        <div id="login-error" class="login-error hidden"></div>
+        <div class="modal-actions">
+          <button id="btn-login-confirm">Log in</button>
+          <button id="btn-login-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Logout (fixed, bottom-right, admin only) ─────────── -->
     <button id="btn-logout" class="logout-fab hidden">Logout</button>
 

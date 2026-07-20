@@ -2,6 +2,9 @@
 
 const TOKEN_KEY = "gc_token";
 
+// Action waiting for a successful login (set while the login modal is open)
+let _pendingAuthedFn = null;
+
 function isAuthed() {
   return !!localStorage.getItem(TOKEN_KEY);
 }
@@ -28,31 +31,72 @@ async function fetchRemoteToken() {
 }
 
 async function guardCUD(fn) {
-  // Already have a token — verify it still matches remote
   if (isAuthed()) {
     const stored  = localStorage.getItem(TOKEN_KEY);
     const current = await fetchRemoteToken();
-    if (current && current === stored) { fn(); return; }
-    // Token changed or unreachable — clear and bail; user can retry
+    // Unreachable (offline, GitHub rate limit): don't punish the user by
+    // logging them out — let the action through; the data push retries anyway.
+    if (current === null || current === stored) { fn(); return; }
+    // Token rotated remotely — this session was revoked
     localStorage.removeItem(TOKEN_KEY);
     applyAuthUI();
+    openLoginModal(fn, "Your session has expired — please log in again.");
+    return;
+  }
+  openLoginModal(fn);
+}
+
+// ── Login modal ───────────────────────────────────────────────────────────────
+
+function openLoginModal(fn, notice) {
+  _pendingAuthedFn = fn || null;
+  $("login-user").value = "";
+  $("login-pass").value = "";
+  setLoginError(notice || "");
+  $("btn-login-confirm").disabled = false;
+  show("modal-login-overlay");
+  $("login-user").focus();
+}
+
+function closeLoginModal() {
+  hide("modal-login-overlay");
+  _pendingAuthedFn = null;
+}
+
+function isLoginModalOpen() {
+  return !$("modal-login-overlay").classList.contains("hidden");
+}
+
+function setLoginError(msg) {
+  setText("login-error", msg);
+  setVisible("login-error", !!msg);
+}
+
+async function submitLogin() {
+  const username = $("login-user").value.trim().toLowerCase();
+  const password = $("login-pass").value;
+
+  if (username !== "admin" || password !== "admindeutsch") {
+    setLoginError("Incorrect username or password.");
     return;
   }
 
-  // No token — prompt for credentials
-  const username = window.prompt("User:");
-  if (username === null || username.trim() !== "admin") return;
-
-  const password = window.prompt("Password:");
-  if (password === null) return;
-  if (password !== "admindeutsch") { window.alert("Incorrect password."); return; }
-
+  const btn = $("btn-login-confirm");
+  btn.disabled = true;
+  setLoginError("");
   const token = await fetchRemoteToken();
-  if (!token) { window.alert("Could not reach server."); return; }
+  btn.disabled = false;
+
+  if (!token) {
+    setLoginError("Could not reach the server — check your connection and try again.");
+    return;
+  }
 
   localStorage.setItem(TOKEN_KEY, token);
   applyAuthUI();
-  fn();
+  const fn = _pendingAuthedFn;
+  closeLoginModal();
+  if (fn) fn();
 }
 
 function doLogout() {

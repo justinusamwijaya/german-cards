@@ -451,37 +451,72 @@ async function fetchRemoteToken() {
   }
 }
 
-async function adminGate() {
-  const stored = localStorage.getItem(TOKEN_KEY);
-  if (stored) {
-    const current = await fetchRemoteToken();
-    if (current && current === stored) return true;
-    localStorage.removeItem(TOKEN_KEY);
+function openLoginModal() {
+  $id("login-user").value = "";
+  $id("login-pass").value = "";
+  setLoginError("");
+  $id("btn-login-confirm").disabled = false;
+  $id("login-modal-overlay").classList.remove("hidden");
+  $id("login-user").focus();
+}
+
+function closeLoginModal() {
+  $id("login-modal-overlay").classList.add("hidden");
+}
+
+function isLoginModalOpen() {
+  return !$id("login-modal-overlay").classList.contains("hidden");
+}
+
+function setLoginError(msg) {
+  const el = $id("login-error");
+  el.textContent = msg;
+  el.classList.toggle("hidden", !msg);
+}
+
+async function submitLogin() {
+  const username = $id("login-user").value.trim().toLowerCase();
+  const password = $id("login-pass").value;
+
+  if (username !== "admin" || password !== "admindeutsch") {
+    setLoginError("Incorrect username or password.");
+    return;
   }
-  const username = window.prompt("User:");
-  if (username === null || username.trim() !== "admin") return false;
-  const password = window.prompt("Password:");
-  if (password === null) return false;
-  if (password !== "admindeutsch") {
-    window.alert("Incorrect password.");
-    return false;
-  }
+
+  const btn = $id("btn-login-confirm");
+  btn.disabled = true;
+  setLoginError("");
   const token = await fetchRemoteToken();
+  btn.disabled = false;
+
   if (!token) {
-    window.alert("Could not reach server.");
-    return false;
+    setLoginError("Could not reach the server — check your connection and try again.");
+    return;
   }
+
   localStorage.setItem(TOKEN_KEY, token);
-  return true;
+  closeLoginModal();
+  showAdmin();
 }
 
 let _submissions = [];
 
-async function openAdmin() {
-  const ok = await adminGate();
-  if (!ok) return;
+async function showAdmin() {
   showView("view-admin");
   await loadSubmissions();
+}
+
+async function openAdmin() {
+  const stored = localStorage.getItem(TOKEN_KEY);
+  if (stored) {
+    const current = await fetchRemoteToken();
+    // Unreachable: don't log out over a network hiccup — the admin view's own
+    // loading will surface any real connectivity problem.
+    if (current === null || current === stored) { showAdmin(); return; }
+    // Token rotated remotely — session revoked
+    localStorage.removeItem(TOKEN_KEY);
+  }
+  openLoginModal();
 }
 
 async function loadSubmissions() {
@@ -632,6 +667,16 @@ function init() {
 
   $id("btn-admin").addEventListener("click", openAdmin);
   $id("btn-admin-refresh").addEventListener("click", loadSubmissions);
+  $id("btn-login-confirm").addEventListener("click", submitLogin);
+  $id("btn-login-cancel").addEventListener("click", closeLoginModal);
+  $id("login-modal-overlay").addEventListener("click", (e) => {
+    if (e.target === $id("login-modal-overlay")) closeLoginModal();
+  });
+  ["login-user", "login-pass"].forEach((id) =>
+    $id(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitLogin();
+    }),
+  );
   $id("submissions-list").addEventListener("click", (e) => {
     const btn = e.target.closest(".s-pdf");
     if (btn) downloadPdf(_submissions[Number(btn.dataset.sub)]);
@@ -641,6 +686,7 @@ function init() {
     if (e.key === "Escape") {
       $id("name-modal-overlay").classList.add("hidden");
       $id("resume-modal-overlay").classList.add("hidden");
+      closeLoginModal();
     }
   });
 }
