@@ -27,26 +27,77 @@ function showView(id) {
   $(id).classList.add("active");
 }
 
-function goToLibrary() {
+function goToLibrary(opts = {}) {
   state.viewMode    = "library";
   state.activeGroupId = null;
   showView("view-study");
   updateStudyHeader();
   switchDeck(state.deck === "combined" ? "nouns" : state.deck);
+  if (!opts.skipRoute) setRoute("");
 }
 
-function goToGroups() {
+function goToGroups(opts = {}) {
   showView("view-groups");
   renderGroupsList();
+  if (!opts.skipRoute) setRoute("#/groups");
 }
 
-function openGroup(groupId) {
+function openGroup(groupId, opts = {}) {
   state.viewMode    = "group-study";
   state.activeGroupId = groupId;
   showView("view-study");
   updateStudyHeader();
   switchDeck("nouns");
+  if (!opts.skipRoute) {
+    const group = loadData().groups.find((g) => g.id === groupId);
+    setRoute(group ? hashForGroup(group) : `#/groups/${groupId}`);
+  }
 }
+
+// ── Routing (hash-based: #/groups/<id>, #/chapters/<n>, #/groups) ─────────────
+
+const CHAPTER_ROUTE_RE = /^Chapter ([1-9]|1[0-2])$/;
+
+function chapterNumberForGroup(group) {
+  const m = group && CHAPTER_ROUTE_RE.exec(group.name);
+  return m ? m[1] : null;
+}
+
+function hashForGroup(group) {
+  const num = chapterNumberForGroup(group);
+  return num ? `#/chapters/${num}` : `#/groups/${group.id}`;
+}
+
+function setRoute(hash) {
+  if (location.hash !== hash) location.hash = hash;
+}
+
+function applyRoute() {
+  const hash = location.hash;
+
+  const chapterMatch = /^#\/chapters\/(\d{1,2})$/.exec(hash);
+  if (chapterMatch) {
+    const group = loadData().groups.find((g) => chapterNumberForGroup(g) === chapterMatch[1]);
+    if (group) { openGroup(group.id, { skipRoute: true }); return; }
+    goToGroups({ skipRoute: true });
+    return;
+  }
+
+  const groupMatch = /^#\/groups\/(.+)$/.exec(hash);
+  if (groupMatch) {
+    const id    = decodeURIComponent(groupMatch[1]);
+    const group = loadData().groups.find((g) => g.id === id);
+    if (group) { openGroup(id, { skipRoute: true }); return; }
+    goToGroups({ skipRoute: true });
+    return;
+  }
+
+  if (hash === "#/groups") { goToGroups({ skipRoute: true }); return; }
+
+  if (!hash || hash === "#" || hash === "#/") goToLibrary({ skipRoute: true });
+}
+
+window.addEventListener("hashchange", applyRoute);
 
 function updateStudyHeader() {
   const inGroup = state.viewMode === "group-study";
@@ -478,4 +529,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   init();
   applyAuthUI();
+  applyRoute();
 });
